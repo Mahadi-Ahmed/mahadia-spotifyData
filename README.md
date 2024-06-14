@@ -21,4 +21,5 @@ Use my spotify data somehow
 - Countries where i've used Spotify
 - breakdown of reason_start / reason_end
 - ratio of shuffle
+- When did i first start to listen on spotify
 
