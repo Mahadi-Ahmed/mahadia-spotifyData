@@ -2,10 +2,10 @@
 Use my spotify data somehow
 
 # ToDo:
-[] Setup containerized psql
-[] Make a plan & verify how to perist the data between container restarts & re-creations
-[] Create schemas for the psql
-[] Create a script to import spotifyData to psql
+[] Setup containerized psql  
+[] Make a plan & verify how to perist the data between container restarts & re-creations  
+[] Create schemas for the psql  
+[] Create a script to import spotifyData to psql  
 
 # Look into what i can use from Spotify's [web api](https://developer.spotify.com/documentation/web-api)
 
@@ -22,4 +22,6 @@ Use my spotify data somehow
 - breakdown of reason_start / reason_end
 - ratio of shuffle
 - When did i first start to listen on spotify
+- total time spent listening
 
+- Search for a song, show first time i listened to that song
