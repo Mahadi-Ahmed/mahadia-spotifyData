@@ -22,6 +22,3 @@ export const getBearerToken = async () => {
     console.log(error)
   }
 }
-
-getBearerToken()
-
