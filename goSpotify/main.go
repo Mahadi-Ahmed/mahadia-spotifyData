@@ -9,16 +9,15 @@ import (
 )
 
 func main() {
-	// jsonFile, err := os.Open("../rawSpotifyData/smallSample.json")
-	jsonFile, err := os.Open("../rawSpotifyData/endsong_0.json")
+	endsong_0, err := os.Open("../rawSpotifyData/endsong_0.json")
 
 	if err != nil {
 		fmt.Println(err)
 	}
-	defer jsonFile.Close()
+	defer endsong_0.Close()
 
 	// Read the JSON file content
-	byteValue, err := io.ReadAll(jsonFile)
+	byteValue, err := io.ReadAll(endsong_0)
 	var spotifyData []models.SpotifyData
 	err = json.Unmarshal(byteValue, &spotifyData)
 	if err != nil {
@@ -28,6 +27,7 @@ func main() {
   fmt.Println(d0)
 
 }
+
 
 func getObjectCount(dataSheet []models.SpotifyData) (count int) {
   count = 0
