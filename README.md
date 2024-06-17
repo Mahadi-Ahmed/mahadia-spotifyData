@@ -23,5 +23,7 @@ Use my spotify data somehow
 - ratio of shuffle
 - When did i first start to listen on spotify
 - total time spent listening
+- longest "sessien" of listening to music, in a day
+- longest streak of consecutive days of listening to music
 
 - Search for a song, show first time i listened to that song
