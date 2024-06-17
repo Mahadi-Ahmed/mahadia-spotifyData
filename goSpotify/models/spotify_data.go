@@ -22,7 +22,7 @@ type SpotifyData struct {
     ReasonStart                  string    `json:"reason_start"`
     ReasonEnd                    string    `json:"reason_end"`
     Shuffle                      bool      `json:"shuffle"`
-    Skipped                      *bool     `json:"skipped"`
+    Skipped                      bool     `json:"skipped"`
     Offline                      bool      `json:"offline"`
     OfflineTimestamp             int64     `json:"offline_timestamp"`
     IncognitoMode                bool      `json:"incognito_mode"`
