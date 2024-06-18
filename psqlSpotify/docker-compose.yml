@@ -1,0 +1,11 @@
+version: '3.8'
+
+services:
+  some-postgres:
+    image: postgres:16.3
+    container_name: some-postgres
+    restart: always
+    environment:
+      POSTGRES_PASSWORD: mysecretpassword
+    volumes:
+      - ./psqlDbData:/var/lib/postgresql/data
