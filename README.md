@@ -2,8 +2,8 @@
 Use my spotify data somehow
 
 # ToDo:
-- [] Setup containerized psql  
-- [] Make a plan & verify how to perist the data between container restarts & re-creations  
+- [x] Setup containerized psql  
+- [x] Make a plan & verify how to perist the data between container restarts & re-creations  
 - [] Create schemas for the psql  
 - [] Create a script to import spotifyData to psql  
 
