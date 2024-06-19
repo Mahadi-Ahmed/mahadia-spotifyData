@@ -2,6 +2,9 @@
   "name": "spotifyapiscripts",
   "module": "spotifyApi.ts",
   "type": "module",
+  "scripts": {
+    "dev": "bun run spotifyApi.ts"
+  },
   "devDependencies": {
     "@types/bun": "latest"
   },
