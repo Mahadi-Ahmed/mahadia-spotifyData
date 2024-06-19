@@ -96,6 +96,8 @@ dist
 # Serverless directories
 .serverless/
 
+# db volume docker
+*/psqlDbData/*
 # FuseBox cache
 .fusebox/
 
