@@ -11,6 +11,20 @@ import (
 	"github.com/joho/godotenv"
 )
 
+type postgres struct {
+	db *pgx.Conn
+}
+
+func NewPG(ctx context.Context, connStr string) (*pgx.Conn, error) {
+	// NOTE: pgx.Connect is not concurrency safe, if needed look into pgxpool@github.com/jackc/pgx/v5/pgxpool
+	conn, err := pgx.Connect(context.Background(), connStr)
+	if err != nil {
+		fmt.Println("unable to connect to database", err)
+		os.Exit(1)
+	}
+  return conn, nil
+}
+
 func init() {
 	err := godotenv.Load()
 	if err != nil {
@@ -27,18 +41,14 @@ func main() {
 	)
 
 	connStr := "postgres://" + dbUser + ":" + dbPassword + "@" + dbHost + "/" + dbName + "?sslmode=disable"
-  conn, err := pgx.Connect(context.Background(), connStr)
-  if err != nil {
-    fmt.Println("unable to connect to database", err)
-    os.Exit(1)
-  }
-  defer conn.Close(context.Background())
+  db, err := NewPG(context.Background(), connStr)
+	defer db.Close(context.Background())
 
-  var employees string
-  err = conn.QueryRow(context.Background(), "select name from employees where salary=65000").Scan(&employees)
-  if err != nil {
-    fmt.Println("Query failed")
-    fmt.Println(err)
-  }
-  fmt.Println(employees)
+	var employees string
+	err = db.QueryRow(context.Background(), "select name from employees where salary=65000").Scan(&employees)
+	if err != nil {
+		fmt.Println("Query failed")
+		fmt.Println(err)
+	}
+	fmt.Println(employees)
 }
