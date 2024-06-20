@@ -120,3 +120,52 @@ func (pg *Postgres) CreatePlaybackTable(ctx context.Context) error {
 
 	return nil
 }
+
+func (pg *Postgres) DropAllTables(ctx context.Context) error {
+	if err := pg.DropPlaybackTable(ctx); err != nil {
+		return err
+	}
+
+	if err := pg.DropUsersTable(ctx); err != nil {
+		return err
+	}
+
+	if err := pg.DropTrackTable(ctx); err != nil {
+		return err
+	}
+	return nil
+}
+
+func (pg *Postgres) DropPlaybackTable(ctx context.Context) error {
+	query := `DROP TABLE playback`
+	_, err := pg.Db.Exec(ctx, query)
+	if err != nil {
+		return fmt.Errorf("unable to create table: %w", err)
+	}
+
+	fmt.Println("dropped table playback")
+	return nil
+}
+
+
+func (pg *Postgres) DropUsersTable(ctx context.Context) error {
+	query := `DROP TABLE users`
+	_, err := pg.Db.Exec(ctx, query)
+	if err != nil {
+		return fmt.Errorf("unable to create table: %w", err)
+	}
+
+	fmt.Println("dropped table users")
+	return nil
+}
+
+func (pg *Postgres) DropTrackTable(ctx context.Context) error {
+	query := `DROP TABLE track`
+	_, err := pg.Db.Exec(ctx, query)
+	if err != nil {
+		return fmt.Errorf("unable to create table: %w", err)
+	}
+
+	fmt.Println("dropped table track")
+	return nil
+}
