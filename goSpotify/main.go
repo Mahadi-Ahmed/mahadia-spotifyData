@@ -32,12 +32,18 @@ func main() {
 	}
 	defer pgConn.Close()
 
-	var employees string
-	err = pgConn.Db.QueryRow(context.Background(), "SELECT name FROM employees WHERE salary=65000").Scan(&employees)
+	err = pgConn.CreateAllTables(context.Background())
 	if err != nil {
-		fmt.Println("Query failed")
 		fmt.Println(err)
-	} else {
-		fmt.Println(employees)
 	}
 }
+
+// var employees string
+// err = pgConn.Db.QueryRow(context.Background(), "SELECT name FROM employees WHERE salary=65000").Scan(&employees)
+// if err != nil {
+// 	fmt.Println("Query failed")
+// 	fmt.Println(err)
+// } else {
+// 	fmt.Println(employees)
+// }
+//
