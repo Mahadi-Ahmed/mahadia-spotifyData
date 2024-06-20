@@ -9,6 +9,8 @@ Use my spotify data somehow
 - [] Create a functionality to seed spotifyData
 - [] Try seeding data with a small subset of spotify data
 
+- [] parallelise the functions
+
 ---
 # Look into what i can use from Spotify's [web api](https://developer.spotify.com/documentation/web-api)
 
