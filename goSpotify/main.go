@@ -2,11 +2,14 @@ package main
 
 import (
 	"context"
+	"encoding/json"
 	"fmt"
+	"io"
 	"log"
 	"os"
 
 	"github.com/joho/godotenv"
+	"github.com/mahadia/mahadia-spotifyData/goSpotify/models"
 	"github.com/mahadia/mahadia-spotifyData/goSpotify/pg"
 )
 
@@ -32,26 +35,52 @@ func main() {
 	}
 	defer pgConn.Close()
 
-  // NOTE: Create tables
+	// NOTE: Create tables
 	// err = pgConn.CreateAllTables(context.Background())
 	// if err != nil {
 	// 	fmt.Println(err)
 	// }
 
-  // NOTE: Drop tables
-	err = pgConn.DropAllTables(context.Background())
+	// NOTE: Drop tables
+	// err = pgConn.DropAllTables(context.Background())
+	// if err != nil {
+	// 	fmt.Println(err)
+	// }
+
+	data, err := processSpotifyData()
 	if err != nil {
 		fmt.Println(err)
 	}
+	for _, v := range data {
+		insertIntoDb(v)
+	}
 }
 
+func insertIntoDb(dbEntry models.SpotifyData) error {
+	fmt.Printf("type of: %T\n", dbEntry.MasterMetadataTrackName)
 
-// var employees string
-// err = pgConn.Db.QueryRow(context.Background(), "SELECT name FROM employees WHERE salary=65000").Scan(&employees)
-// if err != nil {
-// 	fmt.Println("Query failed")
-// 	fmt.Println(err)
-// } else {
-// 	fmt.Println(employees)
-// }
-//
+	return nil
+}
+
+func processSpotifyData() ([]models.SpotifyData, error) {
+	jsonFile, err := os.Open("../rawSpotifyData/smallSample.json")
+	if err != nil {
+		fmt.Println(err)
+		return nil, err
+	}
+	defer jsonFile.Close()
+
+	byteValue, err := io.ReadAll(jsonFile)
+	var spotifyMiniData []models.SpotifyData
+	err = json.Unmarshal(byteValue, &spotifyMiniData)
+	if err != nil {
+		fmt.Println("kaos with unmarshal spotify data", err)
+		return nil, err
+	}
+
+	// for _, v := range spotifyMiniData {
+	// 	fmt.Println(v.MasterMetadataTrackName)
+	// }
+
+	return spotifyMiniData, nil
+}
