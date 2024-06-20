@@ -1,13 +1,13 @@
 # Scratchpad for db diagrams
-Table Users {
-    username string [primary key]
+Table users{
+    user_name string [primary key]
 }
 
-Table Playbacks {
+Table playback {
     id int [primary key]
-    username string
+    user_name string
     ts timestamp
-    trackId string
+    track_id string
     platform string
     ms_played bigint
     conn_country string
@@ -22,8 +22,8 @@ Table Playbacks {
     incognito_mode boolean
 }
 
-Table Tracks {
-    trackId string [primary key]
+Table track {
+    track_id string [primary key]
     track_name string
     album_artist_name string
     album_album_name string
@@ -33,9 +33,9 @@ Table Tracks {
     spotify_episode_uri string
 }
 
-Ref: "Users"."username" < "Playbacks"."username"
+Ref: "users"."user_name" < "playbacks"."user_name"
 
-Ref: "Playbacks"."trackId" < "Tracks"."trackId"
+Ref: "playbacks"."track_id" < "track"."track_id"
 
 <!-- // TODO: Create this table later -->
 <!-- // Table Artist {} -->

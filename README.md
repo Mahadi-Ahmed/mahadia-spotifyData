@@ -5,8 +5,8 @@ Use my spotify data somehow
 - [x] Setup containerized psql  
 - [x] Make a plan & verify how to perist the data between container restarts & re-creations  
 - [x] Connect to db via go
-- [] Create schemas for the psql  
-- [] Create a functionality to import spotifyData to psql  
+- [x] Create schemas for the psql  
+- [] Create a functionality to seed spotifyData
 - [] Try seeding data with a small subset of spotify data
 
 ---
