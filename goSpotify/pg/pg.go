@@ -71,8 +71,8 @@ func (pg *Postgres) CreateTracksTable(ctx context.Context) error {
 	query := `CREATE TABLE IF NOT EXISTS track (
     track_id VARCHAR PRIMARY KEY,
     track_name VARCHAR,
-    album_artist_name VARCHAR,
-    album_album_name VARCHAR,
+    artist_name VARCHAR,
+    album_name VARCHAR,
     spotify_track_uri VARCHAR,
     episode_name VARCHAR,
     episode_show_name VARCHAR,

@@ -25,8 +25,8 @@ Table playback {
 Table track {
     track_id string [primary key]
     track_name string
-    album_artist_name string
-    album_album_name string
+    artist_name string
+    album_name string
     spotify_track_uri string
     episode_name string
     episode_show_name string
