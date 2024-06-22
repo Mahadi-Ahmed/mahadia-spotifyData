@@ -11,6 +11,8 @@ import (
 func main() {
 	// countSheets()
 	// fileName := fmt.Sprintf("%s%d%s", "../rawSpotifyData/MyDataGo/endsong_", i, ".json")
+	// jsonFile, err := os.Open("../rawSpotifyData/endsong_0.json")
+
 	jsonFile, err := os.Open("../rawSpotifyData/smallSample.json")
 	if err != nil {
 		fmt.Println(err)
