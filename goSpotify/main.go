@@ -52,13 +52,25 @@ func main() {
 		fmt.Println(err)
 	}
 	for _, v := range data {
-		insertIntoDb(v)
+		insertIntoDb(pgConn, context.Background(), v)
 	}
 }
 
-func insertIntoDb(dbEntry models.SpotifyData) error {
-	fmt.Printf("type of: %T\n", dbEntry.MasterMetadataTrackName)
+func insertIntoDb(pg *pg.Postgres, ctx context.Context, data models.SpotifyData) error {
+	// fmt.Printf("type of: %T\n", dbEntry.MasterMetadataTrackName)
+	query := `insert into users (user_name) 
+    values ($1)`
 
+	userValues := models.Users{
+		UserName: data.UserName,
+	}
+
+  fmt.Println("gonna insert user: ", userValues.UserName)
+
+	_, err := pg.Db.Exec(ctx, query, userValues.UserName)
+	if err != nil {
+		return err
+	}
 	return nil
 }
 
@@ -77,10 +89,6 @@ func processSpotifyData() ([]models.SpotifyData, error) {
 		fmt.Println("kaos with unmarshal spotify data", err)
 		return nil, err
 	}
-
-	// for _, v := range spotifyMiniData {
-	// 	fmt.Println(v.MasterMetadataTrackName)
-	// }
 
 	return spotifyMiniData, nil
 }
