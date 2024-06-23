@@ -114,9 +114,16 @@ func InsertPlaybackValues(pg *Postgres, ctx context.Context, data models.Spotify
 		playbackValues.IncognitoMode,
 	)
 
-  if err != nil {
-    return err
-  }
+  // NOTE: Handle error gracefully while also notifying if there are any collisions
+	if err != nil {
+		if pgErr, ok := err.(*pgconn.PgError); ok {
+			if pgErr.Code == "23505" {
+				fmt.Printf("Duplicate playback values for user: %v at time: %v already exists\n", playbackValues.UserName, playbackValues.Timestamp)
+				return nil
+			}
+		}
+		return err
+	}
 
 	return nil
 }
