@@ -8,6 +8,7 @@ Use my spotify data somehow
 - [x] Create schemas for the psql  
 - [] Create a functionality to seed spotifyData
 - [] Try seeding data with a small subset of spotify data
+- [] write tests
 
 - [] parallelise the functions
 
