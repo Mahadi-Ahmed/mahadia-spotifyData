@@ -68,6 +68,9 @@ func InsertPlaybackValues(pg *Postgres, ctx context.Context, data models.Spotify
 }
 
 func InsertTrackValues(pg *Postgres, ctx context.Context, data models.SpotifyData) error {
+  fmt.Println()
+  fmt.Println("InsertTrackValues")
+  fmt.Println()
 	query := `insert into track
 	   (
 	     track_id,
@@ -114,6 +117,9 @@ func InsertTrackValues(pg *Postgres, ctx context.Context, data models.SpotifyDat
 }
 
 func InsertUsersValues(pg *Postgres, ctx context.Context, data models.SpotifyData) error {
+  fmt.Println()
+  fmt.Println("InsertUsersValues")
+  fmt.Println()
 	query := `insert into users (user_name) 
     values ($1)`
 
