@@ -68,9 +68,6 @@ func InsertPlaybackValues(pg *Postgres, ctx context.Context, data models.Spotify
 }
 
 func InsertTrackValues(pg *Postgres, ctx context.Context, data models.SpotifyData) error {
-  fmt.Println()
-  fmt.Println("InsertTrackValues")
-  fmt.Println()
 	query := `insert into track
 	   (
 	     track_id,
@@ -81,7 +78,7 @@ func InsertTrackValues(pg *Postgres, ctx context.Context, data models.SpotifyDat
 	     episode_name,
 	     episode_show_name,
 	     spotify_episode_uri
-	   ) values ($1, $2, $3, $4, $5 ,$6, $7, $8)`
+	   ) values ($1, $2, $3, $4, $5 ,$6, $7, $8) on conflict (track_id) do nothing`
 
 	trackId := strings.TrimPrefix(data.SpotifyTrackUri, "spotify:track:")
 	trackValues := models.Track{
@@ -117,11 +114,8 @@ func InsertTrackValues(pg *Postgres, ctx context.Context, data models.SpotifyDat
 }
 
 func InsertUsersValues(pg *Postgres, ctx context.Context, data models.SpotifyData) error {
-  fmt.Println()
-  fmt.Println("InsertUsersValues")
-  fmt.Println()
 	query := `insert into users (user_name) 
-    values ($1)`
+    values ($1) on conflict (user_name) do nothing`
 
 	userValues := models.Users{
 		UserName: &data.UserName,
