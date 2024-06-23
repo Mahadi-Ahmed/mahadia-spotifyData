@@ -240,7 +240,8 @@ func (pg *Postgres) CreatePlaybackTable(ctx context.Context) error {
     offline_timestamp BIGINT,
     incognito_mode BOOLEAN,
     FOREIGN KEY (user_name) REFERENCES users(user_name),
-    FOREIGN KEY (track_id) REFERENCES track(track_id)
+    FOREIGN KEY (track_id) REFERENCES track(track_id),
+    CONSTRAINT UNIQUE_USER_TIMESTAMP_COMBO UNIQUE (user_name, ts, track_id)
   )`
 
 	_, err := pg.Db.Exec(ctx, query)
@@ -269,7 +270,7 @@ func (pg *Postgres) DropAllTables(ctx context.Context) error {
 }
 
 func (pg *Postgres) DropPlaybackTable(ctx context.Context) error {
-	query := `drop table if exits playback`
+	query := `drop table if exists playback`
 	_, err := pg.Db.Exec(ctx, query)
 	if err != nil {
 		return fmt.Errorf("unable to create table: %w", err)
@@ -280,7 +281,7 @@ func (pg *Postgres) DropPlaybackTable(ctx context.Context) error {
 }
 
 func (pg *Postgres) DropUsersTable(ctx context.Context) error {
-	query := `drop table if exits users`
+	query := `drop table if exists users`
 	_, err := pg.Db.Exec(ctx, query)
 	if err != nil {
 		return fmt.Errorf("unable to create table: %w", err)
@@ -291,7 +292,7 @@ func (pg *Postgres) DropUsersTable(ctx context.Context) error {
 }
 
 func (pg *Postgres) DropTrackTable(ctx context.Context) error {
-	query := `drop table if exits track`
+	query := `drop table if exists track`
 	_, err := pg.Db.Exec(ctx, query)
 	if err != nil {
 		return fmt.Errorf("unable to create table: %w", err)
