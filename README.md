@@ -8,7 +8,9 @@ Use my spotify data somehow
 - [x] Create schemas for the psql  
 - [x] Create a functionality to seed spotifyData
 - [x] Try seeding data with a small subset of spotify data
+- [] Rethink track db, maybe podcast should be its own table or have a flag
 - [] write tests
+- [] batch db inserts
 
 - [] parallelise the functions
 
