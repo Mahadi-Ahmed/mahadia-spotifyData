@@ -50,7 +50,7 @@ type SpotifyData struct {
 	MasterMetadataAlbumArtistName string    `json:"master_metadata_album_artist_name"`
 	MasterMetadataAlbumAlbumName  string    `json:"master_metadata_album_album_name"`
 	SpotifyTrackUri               string    `json:"spotify_track_uri"`
-	EpisodeName                   *string   `json:"episode_name"`
+  EpisodeName                   *string   `json:"episode_name"` // NOTE: use pointers on possible null values
 	EpisodeShowName               *string   `json:"episode_show_name"`
 	SpotifyEpisodeUri             *string   `json:"spotify_episode_uri"`
 	ReasonStart                   string    `json:"reason_start"`

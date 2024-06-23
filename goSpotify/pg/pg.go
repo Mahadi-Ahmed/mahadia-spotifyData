@@ -59,10 +59,64 @@ func InsertIntoDb(pg *Postgres, ctx context.Context, data models.SpotifyData) er
 		return err
 	}
 
+  if err := InsertPlaybackValues(pg, ctx, data); err != nil {
+    return err
+  }
+
 	return nil
 }
 
 func InsertPlaybackValues(pg *Postgres, ctx context.Context, data models.SpotifyData) error {
+	query := `INSERT INTO playback (
+		user_name, ts, track_id, platform, ms_played, conn_country,
+		ip_addr_decrypted, user_agent_decrypted, reason_start, reason_end,
+		shuffle, skipped, offline, offline_timestamp, incognito_mode
+	) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15)`
+
+	trackId := strings.TrimPrefix(data.SpotifyTrackUri, "spotify:track:")
+	playbackValues := models.Playback{
+		UserName:           data.UserName,
+		Timestamp:          data.Timestamp,
+		TrackId:            trackId,
+		Platform:           data.Platform,
+		MsPlayed:           data.MsPlayed,
+		ConnCountry:        data.ConnCountry,
+		IpAddrDecrypted:    data.IpAddrDecrypted,
+		UserAgentDecrypted: data.UserAgentDecrypted,
+		ReasonStart:        data.ReasonStart,
+		ReasonEnd:          data.ReasonEnd,
+		Shuffle:            data.Shuffle,
+		Skipped:            data.Shuffle,
+		Offline:            data.Offline,
+		OfflineTimestamp:   data.OfflineTimestamp,
+		IncognitoMode:      data.IncognitoMode,
+	}
+
+  fmt.Printf("Inserting playback values for user: %v at time: %v\n", playbackValues.UserName, playbackValues.Timestamp)
+
+	_, err := pg.Db.Exec(
+		ctx, query,
+		playbackValues.UserName,
+		playbackValues.Timestamp,
+		// playbackValues.TrackID,
+		playbackValues.TrackId,
+		playbackValues.Platform,
+		playbackValues.MsPlayed,
+		playbackValues.ConnCountry,
+		playbackValues.IpAddrDecrypted,
+		playbackValues.UserAgentDecrypted,
+		playbackValues.ReasonStart,
+		playbackValues.ReasonEnd,
+		playbackValues.Shuffle,
+		playbackValues.Skipped,
+		playbackValues.Offline,
+		playbackValues.OfflineTimestamp,
+		playbackValues.IncognitoMode,
+	)
+
+  if err != nil {
+    return err
+  }
 
 	return nil
 }
