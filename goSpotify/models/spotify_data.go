@@ -5,17 +5,18 @@ import (
 )
 
 type Users struct {
-	UserName string `json:"username"`
+	UserName *string
 }
 
 type Track struct {
-	TrackID         *string
-	TrackName       string  `json:"master_metadata_track_name"`
-	ArtistName      string  `json:"master_metadata_album_artist_name"`
-	AlbumAlbumName  string  `json:"master_metadata_album_album_name"`
-	SpotifyTrackUri string  `json:"spotify_track_uri"`
-	EpisodeName     *string `json:"episode_name"`
-	EpisodeShowName *string `json:"episode_show_name"`
+	TrackID           *string
+	TrackName         *string
+	ArtistName        *string
+	AlbumName         *string
+	SpotifyTrackUri   *string
+	EpisodeName       *string
+	EpisodeShowName   *string
+	SpotifyEpisodeUri *string
 }
 
 type Playback struct {

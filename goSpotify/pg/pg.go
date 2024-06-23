@@ -3,9 +3,11 @@ package pg
 import (
 	"context"
 	"fmt"
+	"strings"
 	"sync"
 
 	"github.com/jackc/pgx/v5/pgxpool"
+	"github.com/mahadia/mahadia-spotifyData/goSpotify/models"
 )
 
 type Postgres struct {
@@ -35,10 +37,6 @@ func NewPG(ctx context.Context, connStr string) (*Postgres, error) {
 	return pgInstance, nil
 }
 
-func (pg *Postgres) Close() {
-	pg.Db.Close()
-}
-
 func (pg *Postgres) CreateAllTables(ctx context.Context) error {
 	if err := pg.CreateUsersTable(ctx); err != nil {
 		return err
@@ -47,6 +45,86 @@ func (pg *Postgres) CreateAllTables(ctx context.Context) error {
 		return err
 	}
 	if err := pg.CreatePlaybackTable(ctx); err != nil {
+		return err
+	}
+	return nil
+}
+
+func InsertIntoDb(pg *Postgres, ctx context.Context, data models.SpotifyData) error {
+	if err := InsertUsersValues(pg, ctx, data); err != nil {
+		return err
+	}
+
+	if err := InsertTrackValues(pg, ctx, data); err != nil {
+		return err
+	}
+
+	return nil
+}
+
+func InsertPlaybackValues(pg *Postgres, ctx context.Context, data models.SpotifyData) error {
+
+	return nil
+}
+
+func InsertTrackValues(pg *Postgres, ctx context.Context, data models.SpotifyData) error {
+	query := `insert into track
+	   (
+	     track_id,
+	     track_name,
+	     artist_name,
+	     album_name,
+	     spotify_track_uri,
+	     episode_name,
+	     episode_show_name,
+	     spotify_episode_uri
+	   ) values ($1, $2, $3, $4, $5 ,$6, $7, $8)`
+
+	trackId := strings.TrimPrefix(data.SpotifyTrackUri, "spotify:track:")
+	trackValues := models.Track{
+		TrackID:           &trackId,
+		TrackName:         &data.MasterMetadataTrackName,
+		ArtistName:        &data.MasterMetadataAlbumArtistName,
+		AlbumName:         &data.MasterMetadataAlbumAlbumName,
+		SpotifyTrackUri:   &data.SpotifyTrackUri,
+		EpisodeName:       data.EpisodeName,
+		EpisodeShowName:   data.EpisodeShowName,
+		SpotifyEpisodeUri: data.SpotifyEpisodeUri,
+	}
+
+	fmt.Println("Inserting these values to Track: ")
+	fmt.Println(*trackValues.TrackName + "\n")
+
+	_, err := pg.Db.Exec(
+		ctx, query,
+		trackValues.TrackID,
+		trackValues.TrackName,
+		trackValues.ArtistName,
+		trackValues.AlbumName,
+		trackValues.SpotifyTrackUri,
+		trackValues.EpisodeName,
+		trackValues.EpisodeShowName,
+		trackValues.SpotifyEpisodeUri)
+
+	if err != nil {
+		return err
+	}
+
+	return nil
+}
+
+func InsertUsersValues(pg *Postgres, ctx context.Context, data models.SpotifyData) error {
+	query := `insert into users (user_name) 
+    values ($1)`
+
+	userValues := models.Users{
+		UserName: &data.UserName,
+	}
+
+	fmt.Println("gonna insert user: ", *userValues.UserName)
+
+	_, err := pg.Db.Exec(ctx, query, userValues.UserName)
+	if err != nil {
 		return err
 	}
 	return nil
@@ -147,7 +225,6 @@ func (pg *Postgres) DropPlaybackTable(ctx context.Context) error {
 	return nil
 }
 
-
 func (pg *Postgres) DropUsersTable(ctx context.Context) error {
 	query := `DROP TABLE users`
 	_, err := pg.Db.Exec(ctx, query)
@@ -168,4 +245,8 @@ func (pg *Postgres) DropTrackTable(ctx context.Context) error {
 
 	fmt.Println("dropped table track")
 	return nil
+}
+
+func (pg *Postgres) Close() {
+	pg.Db.Close()
 }

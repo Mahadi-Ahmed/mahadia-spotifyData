@@ -35,14 +35,14 @@ func main() {
 	}
 	defer pgConn.Close()
 
-	// NOTE: Create tables
-	// err = pgConn.CreateAllTables(context.Background())
+	// NOTE: Drop tables
+	// err = pgConn.DropAllTables(context.Background())
 	// if err != nil {
 	// 	fmt.Println(err)
 	// }
 
-	// NOTE: Drop tables
-	// err = pgConn.DropAllTables(context.Background())
+	// NOTE: Create tables
+	// err = pgConn.CreateAllTables(context.Background())
 	// if err != nil {
 	// 	fmt.Println(err)
 	// }
@@ -51,27 +51,13 @@ func main() {
 	if err != nil {
 		fmt.Println(err)
 	}
+
 	for _, v := range data {
-		insertIntoDb(pgConn, context.Background(), v)
+    err := pg.InsertIntoDb(pgConn, context.Background(), v)
+    if err != nil {
+      fmt.Println(err)
+    }
 	}
-}
-
-func insertIntoDb(pg *pg.Postgres, ctx context.Context, data models.SpotifyData) error {
-	// fmt.Printf("type of: %T\n", dbEntry.MasterMetadataTrackName)
-	query := `insert into users (user_name) 
-    values ($1)`
-
-	userValues := models.Users{
-		UserName: data.UserName,
-	}
-
-  fmt.Println("gonna insert user: ", userValues.UserName)
-
-	_, err := pg.Db.Exec(ctx, query, userValues.UserName)
-	if err != nil {
-		return err
-	}
-	return nil
 }
 
 func processSpotifyData() ([]models.SpotifyData, error) {

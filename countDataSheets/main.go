@@ -6,6 +6,7 @@ import (
 	"github.com/mahadia/mahadia-spotifyData/countDataSheets/models"
 	"io"
 	"os"
+  "strings"
 )
 
 func main() {
@@ -31,7 +32,9 @@ func main() {
 }
 
 func processData(playback models.SpotifyData) error {
-	fmt.Println(playback.MasterMetadataTrackName)
+  b := strings.TrimPrefix(playback.SpotifyTrackUri, "spotify:track:")
+	fmt.Println(playback.SpotifyTrackUri)
+	fmt.Println(b)
 	return nil
 }
 
