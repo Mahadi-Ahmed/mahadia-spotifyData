@@ -62,7 +62,9 @@ func main() {
 }
 
 func processSpotifyData() ([]models.SpotifyData, error) {
-	jsonFile, err := os.Open("../rawSpotifyData/smallSample.json")
+	// jsonFile, err := os.Open("../rawSpotifyData/smallSample.json")
+	jsonFile, err := os.Open("../rawSpotifyData/MyDataGo/endsong_1.json")
+	// jsonFile, err := os.Open("../rawSpotifyData/endsong_0.json")
 	if err != nil {
 		fmt.Println(err)
 		return nil, err
