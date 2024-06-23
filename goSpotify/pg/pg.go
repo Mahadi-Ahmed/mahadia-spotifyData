@@ -6,6 +6,7 @@ import (
 	"strings"
 	"sync"
 
+	"github.com/jackc/pgx/v5/pgconn"
 	"github.com/jackc/pgx/v5/pgxpool"
 	"github.com/mahadia/mahadia-spotifyData/goSpotify/models"
 )
@@ -59,9 +60,9 @@ func InsertIntoDb(pg *Postgres, ctx context.Context, data models.SpotifyData) er
 		return err
 	}
 
-  if err := InsertPlaybackValues(pg, ctx, data); err != nil {
-    return err
-  }
+	if err := InsertPlaybackValues(pg, ctx, data); err != nil {
+		return err
+	}
 
 	return nil
 }
@@ -92,13 +93,12 @@ func InsertPlaybackValues(pg *Postgres, ctx context.Context, data models.Spotify
 		IncognitoMode:      data.IncognitoMode,
 	}
 
-  fmt.Printf("Inserting playback values for user: %v at time: %v\n", playbackValues.UserName, playbackValues.Timestamp)
+	fmt.Printf("Inserting playback values for user: %v with track %v at time: %v\n", playbackValues.UserName, playbackValues.TrackId, playbackValues.Timestamp)
 
 	_, err := pg.Db.Exec(
 		ctx, query,
 		playbackValues.UserName,
 		playbackValues.Timestamp,
-		// playbackValues.TrackID,
 		playbackValues.TrackId,
 		playbackValues.Platform,
 		playbackValues.MsPlayed,
@@ -153,8 +153,7 @@ func InsertTrackValues(pg *Postgres, ctx context.Context, data models.SpotifyDat
 		SpotifyEpisodeUri: data.SpotifyEpisodeUri,
 	}
 
-	fmt.Println("Inserting these values to Track: ")
-	fmt.Println(*trackValues.TrackName + "\n")
+  fmt.Printf("insert into track table: %v\n", *trackValues.TrackName)
 
 	_, err := pg.Db.Exec(
 		ctx, query,
@@ -182,7 +181,7 @@ func InsertUsersValues(pg *Postgres, ctx context.Context, data models.SpotifyDat
 		UserName: &data.UserName,
 	}
 
-	fmt.Println("gonna insert user: ", *userValues.UserName)
+  fmt.Printf("Insert into users table: %v\n", *userValues.UserName)
 
 	_, err := pg.Db.Exec(ctx, query, userValues.UserName)
 	if err != nil {

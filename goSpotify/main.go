@@ -54,6 +54,7 @@ func main() {
 
 	for _, v := range data {
 		err := pg.InsertIntoDb(pgConn, context.Background(), v)
+    fmt.Println()
 		if err != nil {
 			fmt.Println(err)
 		}
