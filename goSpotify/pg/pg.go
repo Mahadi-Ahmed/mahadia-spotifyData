@@ -221,7 +221,7 @@ func (pg *Postgres) DropAllTables(ctx context.Context) error {
 }
 
 func (pg *Postgres) DropPlaybackTable(ctx context.Context) error {
-	query := `DROP TABLE playback`
+	query := `drop table if exits playback`
 	_, err := pg.Db.Exec(ctx, query)
 	if err != nil {
 		return fmt.Errorf("unable to create table: %w", err)
@@ -232,7 +232,7 @@ func (pg *Postgres) DropPlaybackTable(ctx context.Context) error {
 }
 
 func (pg *Postgres) DropUsersTable(ctx context.Context) error {
-	query := `DROP TABLE users`
+	query := `drop table if exits users`
 	_, err := pg.Db.Exec(ctx, query)
 	if err != nil {
 		return fmt.Errorf("unable to create table: %w", err)
@@ -243,7 +243,7 @@ func (pg *Postgres) DropUsersTable(ctx context.Context) error {
 }
 
 func (pg *Postgres) DropTrackTable(ctx context.Context) error {
-	query := `DROP TABLE track`
+	query := `drop table if exits track`
 	_, err := pg.Db.Exec(ctx, query)
 	if err != nil {
 		return fmt.Errorf("unable to create table: %w", err)
