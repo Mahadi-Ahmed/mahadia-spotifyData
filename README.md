@@ -8,7 +8,8 @@ Use my spotify data somehow
 - [x] Create schemas for the psql  
 - [x] Create a functionality to seed spotifyData
 - [x] Try seeding data with a small subset of spotify data
-- [] Rethink track db, maybe podcast should be its own table or have a flag
+- [] Rethink track table, maybe podcast should be its own table or have a flag
+- [] output logs after running the inserts should be a count of rows inserted for each table & also save the id of failed/errored inserts
 - [] write tests
 - [] batch db inserts
 
