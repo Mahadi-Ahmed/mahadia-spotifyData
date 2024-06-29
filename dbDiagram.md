@@ -20,6 +20,7 @@ Table playback {
     offline boolean
     offline_timestamp bigint
     incognito_mode boolean
+    podcast_id string
 }
 
 Table track {
@@ -28,6 +29,10 @@ Table track {
     artist_name string
     album_name string
     spotify_track_uri string
+}
+
+Table podcast {
+    podcast_id string [primary key]
     episode_name string
     episode_show_name string
     spotify_episode_uri string
