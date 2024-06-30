@@ -1,5 +1,5 @@
-# Scratchpad for db diagrams
-Table users{
+# Scratchpad for [db diagrams](https://dbdiagram.io/d)
+Table users {
     user_name string [primary key]
 }
 
@@ -7,7 +7,6 @@ Table playback {
     id int [primary key]
     user_name string
     ts timestamp
-    track_id string
     platform string
     ms_played bigint
     conn_country string
@@ -20,7 +19,13 @@ Table playback {
     offline boolean
     offline_timestamp bigint
     incognito_mode boolean
-    podcast_id string
+    media_type string
+}
+
+Table media {
+    playback_id int
+    media_id string
+    media_type string
 }
 
 Table track {
@@ -38,16 +43,13 @@ Table podcast {
     spotify_episode_uri string
 }
 
-Ref: "users"."user_name" < "playbacks"."user_name"
-
-Ref: "playbacks"."track_id" < "track"."track_id"
+Ref: playback.user_name > users.user_name
+Ref: media.playback_id > playback.id
+Ref: media.media_id > track.track_id
+Ref: media.media_id > podcast.podcast_id
 
 <!-- // TODO: Create this table later -->
 <!-- // Table Artist {} -->
-
-Ref: "Users"."username" < "Playbacks"."username"
-
-Ref: "Playbacks"."ts" < "Tracks"."trackId"
 ---
 
 ![Db Diagram](dbScetch.png)
