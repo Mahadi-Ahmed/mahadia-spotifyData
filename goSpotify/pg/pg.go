@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"strings"
 	"sync"
+  "time"
 
 	"github.com/jackc/pgx/v5/pgconn"
 	"github.com/jackc/pgx/v5/pgxpool"
@@ -451,6 +452,16 @@ func (pg *Postgres) DropPodcastTable(ctx context.Context) error {
 
 func (pg *Postgres) Close() {
 	pg.Db.Close()
+}
+
+func getUnixTs(dateTime string) (int64, error) {
+  t, err := time.Parse(time.RFC3339, dateTime)
+  if err != nil {
+    return 0, err
+  }
+
+  ts := t.Unix()
+  return ts, nil
 }
 
 func trimTrackUri(uri *string) string {
