@@ -170,7 +170,6 @@ func InsertPlaybackValues(pg *Postgres, ctx context.Context, data models.Spotify
 	query := `INSERT INTO playback (
 		user_name,
     ts,
-    track_id,
     platform,
     ms_played,
     conn_country,
@@ -182,21 +181,22 @@ func InsertPlaybackValues(pg *Postgres, ctx context.Context, data models.Spotify
     skipped,
     offline,
     offline_timestamp,
-    incognito_mode, 
-    podcast_id
-    ) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15, $16)`
+    incognito_mode,
+    media_type
+    ) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15)`
 
-	// pdId := Data{SpotifyEpisodeUri: data.SpotifyEpisodeUri}
+	var mediaType string
+	if data.SpotifyTrackUri != nil {
+		mediaType = "track"
+	} else {
+		mediaType = "podcast"
+	}
 
-	// trackId := strings.TrimPrefix(*data.SpotifyTrackUri, "spotify:track:")
-	// podcastId := strings.TrimPrefix(*data.SpotifyEpisodeUri, "spotify:episode:")
-	trackId := trimTrackUri(data.SpotifyTrackUri)
-	podcastId := trimPodcastUri(data.SpotifyEpisodeUri)
+	fmt.Println(mediaType)
 
 	playbackValues := models.Playback{
 		UserName:           data.UserName,
 		Timestamp:          data.Timestamp,
-		TrackId:            trackId,
 		Platform:           data.Platform,
 		MsPlayed:           data.MsPlayed,
 		ConnCountry:        data.ConnCountry,
@@ -209,16 +209,15 @@ func InsertPlaybackValues(pg *Postgres, ctx context.Context, data models.Spotify
 		Offline:            data.Offline,
 		OfflineTimestamp:   data.OfflineTimestamp,
 		IncognitoMode:      data.IncognitoMode,
-		PodcastId:          podcastId,
+		MediaType:          mediaType,
 	}
 
-	fmt.Printf("Inserting playback values for user: %v with track %v at time: %v\n", playbackValues.UserName, playbackValues.TrackId, playbackValues.Timestamp)
+	fmt.Printf("Inserting playback values for user: %v at time: %v\n", playbackValues.UserName, playbackValues.Timestamp)
 
 	_, err := pg.Db.Exec(
 		ctx, query,
 		playbackValues.UserName,
 		playbackValues.Timestamp,
-		playbackValues.TrackId,
 		playbackValues.Platform,
 		playbackValues.MsPlayed,
 		playbackValues.ConnCountry,
@@ -231,7 +230,7 @@ func InsertPlaybackValues(pg *Postgres, ctx context.Context, data models.Spotify
 		playbackValues.Offline,
 		playbackValues.OfflineTimestamp,
 		playbackValues.IncognitoMode,
-		playbackValues.PodcastId,
+		playbackValues.MediaType,
 	)
 
 	// NOTE: Handle error gracefully while also notifying if there are any collisions
