@@ -52,4 +52,4 @@ Ref: media.media_id > podcast.podcast_id
 <!-- // Table Artist {} -->
 ---
 
-![Db Diagram](dbScetch.png)
+![Db Diagram](db_v1.png)
