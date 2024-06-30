@@ -97,8 +97,7 @@ func InsertTrackValues(pg *Postgres, ctx context.Context, data models.SpotifyDat
 	     spotify_track_uri
 	   ) values ($1, $2, $3, $4, $5) on conflict (track_id) do nothing`
 
-	// trackId := strings.TrimPrefix(*data.SpotifyTrackUri, "spotify:track:")
-	trackId := trimTrackUri(data.SpotifyTrackUri)
+	trackId := trimUri(data.SpotifyTrackUri)
 	trackValues := models.Track{
 		TrackID:         trackId,
 		TrackName:       *data.MasterMetadataTrackName,
@@ -136,8 +135,7 @@ func InsertPodcastValues(pg *Postgres, ctx context.Context, data models.SpotifyD
        spotify_episode_uri 
 	   ) values ($1, $2, $3, $4) on conflict (podcast_id) do nothing`
 
-	// podcastId := strings.TrimPrefix(*data.SpotifyEpisodeUri, "spotify:episode:")
-	podcastId := trimPodcastUri(data.SpotifyEpisodeUri)
+	podcastId := trimUri(data.SpotifyEpisodeUri)
 	podcastValues := models.Podcast{
 		PodcastId:         podcastId,
 		EpisodeName:       *data.EpisodeName,
@@ -464,14 +462,7 @@ func getUnixTs(dateTime string) (int64, error) {
   return ts, nil
 }
 
-func trimTrackUri(uri *string) string {
-	if uri != nil {
-		return strings.TrimPrefix(*uri, "spotify:track:")
-	}
-	return ""
-}
-
-func trimPodcastUri(uri *string) string {
+func trimUri(uri *string) string {
 	if uri != nil {
 		return strings.TrimPrefix(*uri, "spotify:episode:")
 	}
