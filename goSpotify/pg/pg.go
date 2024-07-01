@@ -186,16 +186,7 @@ func InsertPlaybackValues(pg *Postgres, ctx context.Context, data models.Spotify
     media_type
     ) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15, $16)`
 
-	var mediaType string
-	var mediaId string
-	if data.SpotifyTrackUri != nil {
-		mediaType = "track"
-		mediaId = trimUri(data.SpotifyTrackUri)
-	} else {
-		mediaType = "podcast"
-		mediaId = trimUri(data.SpotifyEpisodeUri)
-	}
-
+	mediaType, mediaId := getMediaType(data)
 	playbackId, err := generatePlaybackId(data.UserName, data.Timestamp, mediaId)
 	if err != nil {
 		return err
@@ -479,4 +470,15 @@ func trimUri(uri *string) string {
 		return strings.TrimPrefix(*uri, "spotify:")
 	}
 	return ""
+}
+
+func getMediaType(data models.SpotifyData) (mediaType, mediaId string) {
+	if data.SpotifyTrackUri != nil {
+		mediaType = "track"
+		mediaId = trimUri(data.SpotifyTrackUri)
+	} else {
+		mediaType = "podcast"
+		mediaId = trimUri(data.SpotifyEpisodeUri)
+	}
+	return mediaType, mediaId
 }
