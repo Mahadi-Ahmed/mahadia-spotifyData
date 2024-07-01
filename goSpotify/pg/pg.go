@@ -216,11 +216,10 @@ func InsertPlaybackValues(pg *Postgres, ctx context.Context, data models.Spotify
     skipped,
     offline,
     offline_timestamp,
-    incognito_mode,
-    media_type
-    ) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15, $16)`
+    incognito_mode
+    ) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15)`
 
-	mediaType, mediaId := getMediaType(data)
+	_, mediaId := getMediaType(data)
 	playbackId, err := generatePlaybackId(data.UserName, data.Timestamp, mediaId)
 	if err != nil {
 		return err
@@ -242,7 +241,6 @@ func InsertPlaybackValues(pg *Postgres, ctx context.Context, data models.Spotify
 		Offline:            data.Offline,
 		OfflineTimestamp:   data.OfflineTimestamp,
 		IncognitoMode:      data.IncognitoMode,
-		MediaType:          mediaType,
 	}
 
 	fmt.Printf("Inserting playback values for user: %v at time: %v\n", playbackValues.UserName, playbackValues.Timestamp)
@@ -264,7 +262,6 @@ func InsertPlaybackValues(pg *Postgres, ctx context.Context, data models.Spotify
 		playbackValues.Offline,
 		playbackValues.OfflineTimestamp,
 		playbackValues.IncognitoMode,
-		playbackValues.MediaType,
 	)
 
 	// NOTE: Handle error gracefully while also notifying if there are any collisions
@@ -385,7 +382,6 @@ func (pg *Postgres) CreatePlaybackTable(ctx context.Context) error {
     offline BOOLEAN,
     offline_timestamp BIGINT,
     incognito_mode BOOLEAN,
-    media_type VARCHAR,
     FOREIGN KEY (user_name) REFERENCES users(user_name),
     CONSTRAINT UNIQUE_USER_TIMESTAMP_COMBO UNIQUE (user_name, ts)
   )`

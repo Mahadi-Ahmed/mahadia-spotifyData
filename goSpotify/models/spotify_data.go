@@ -39,7 +39,6 @@ type Playback struct {
 	Offline            bool
 	OfflineTimestamp   int64
 	IncognitoMode      bool
-	MediaType          string
 }
 
 type Media struct {

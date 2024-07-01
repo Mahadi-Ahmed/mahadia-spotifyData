@@ -19,7 +19,6 @@ Table playback {
     offline boolean
     offline_timestamp bigint
     incognito_mode boolean
-    media_type string
 }
 
 Table media {
