@@ -109,7 +109,7 @@ func InsertTrackValues(pg *Postgres, ctx context.Context, data models.SpotifyDat
 		SpotifyTrackUri: *data.SpotifyTrackUri,
 	}
 
-	fmt.Printf("insert into track table: %v\n", trackValues.TrackName)
+	fmt.Printf("Insert into track table: %v\n", trackValues.TrackName)
 
 	_, err := pg.Db.Exec(
 		ctx, query,
@@ -146,7 +146,7 @@ func InsertPodcastValues(pg *Postgres, ctx context.Context, data models.SpotifyD
 		SpotifyEpisodeUri: *data.SpotifyEpisodeUri,
 	}
 
-	fmt.Printf("insert into playback table: %v\n", podcastValues.EpisodeName)
+	fmt.Printf("insert into podcast table: %v\n", podcastValues.EpisodeName)
 
 	_, err := pg.Db.Exec(
 		ctx, query,
@@ -182,10 +182,7 @@ func InsertMediaValues(pg *Postgres, ctx context.Context, data models.SpotifyDat
 		MediaType:  mediaType,
 	}
 
-	fmt.Printf("Inserting  into media: %v\n", playbackId)
-	fmt.Printf("media_id: %v", mediaId)
-	fmt.Printf("media_type %v", mediaType)
-	fmt.Println()
+	fmt.Printf("Insert into media playback_id, media_id & media_type: %v %v %v\n", playbackId, mediaId, mediaType)
 	_, errDb := pg.Db.Exec(
 		ctx, query,
 		mediaValues.PlaybackId,
@@ -243,7 +240,7 @@ func InsertPlaybackValues(pg *Postgres, ctx context.Context, data models.Spotify
 		IncognitoMode:      data.IncognitoMode,
 	}
 
-	fmt.Printf("Inserting playback values for user: %v at time: %v\n", playbackValues.UserName, playbackValues.Timestamp)
+	fmt.Printf("Insert into playback values with id: %v\n", playbackId)
 
 	_, errDb := pg.Db.Exec(
 		ctx, query,
