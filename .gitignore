@@ -98,6 +98,11 @@ dist
 
 # db volume docker
 */psqlDbData/*
+# hide actual spotify data
+*/rawSpotifyData/MyDataGo/*
+*/rawSpotifyData/MyData/*
+
+
 # FuseBox cache
 .fusebox/
 

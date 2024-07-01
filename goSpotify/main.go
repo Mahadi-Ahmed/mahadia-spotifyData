@@ -36,16 +36,16 @@ func main() {
 	defer pgConn.Close()
 
 	// NOTE: Drop tables
-	// err = pgConn.DropAllTables(context.Background())
-	// if err != nil {
-	// 	fmt.Println(err)
-	// }
+	err = pgConn.DropAllTables(context.Background())
+	if err != nil {
+		fmt.Println(err)
+	}
 
 	// NOTE: Create tables
-	// err = pgConn.CreateAllTables(context.Background())
-	// if err != nil {
-	// 	fmt.Println(err)
-	// }
+	err = pgConn.CreateAllTables(context.Background())
+	if err != nil {
+		fmt.Println(err)
+	}
 
 	data, err := processSpotifyData()
 	if err != nil {
@@ -62,8 +62,8 @@ func main() {
 }
 
 func processSpotifyData() ([]models.SpotifyData, error) {
-	// jsonFile, err := os.Open("../rawSpotifyData/smallSample.json")
-	jsonFile, err := os.Open("../rawSpotifyData/MyDataGo/endsong_1.json")
+	jsonFile, err := os.Open("../rawSpotifyData/smallSample.json")
+	// jsonFile, err := os.Open("../rawSpotifyData/MyDataGo/endsong_1.json")
 	// jsonFile, err := os.Open("../rawSpotifyData/endsong_0.json")
 	if err != nil {
 		fmt.Println(err)
@@ -73,7 +73,9 @@ func processSpotifyData() ([]models.SpotifyData, error) {
 
 	byteValue, err := io.ReadAll(jsonFile)
 	var spotifyMiniData []models.SpotifyData
+
 	err = json.Unmarshal(byteValue, &spotifyMiniData)
+  // fmt.Println(spotifyMiniData)
 	if err != nil {
 		fmt.Println("kaos with unmarshal spotify data", err)
 		return nil, err
