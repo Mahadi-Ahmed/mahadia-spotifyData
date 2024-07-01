@@ -42,6 +42,12 @@ type Playback struct {
 	MediaType          string
 }
 
+type Media struct {
+	PlaybackId string
+	MediaId    string
+	MediaType  string
+}
+
 // NOTE: use pointers on possible null values
 type SpotifyData struct {
 	Timestamp                     time.Time `json:"ts"`

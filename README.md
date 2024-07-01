@@ -12,7 +12,7 @@ Use my spotify data somehow
     - [x] refactor playback table
     - [x] dont use serial as pk for playback table, create a composite unique key instead
     - [x] add functions, create, delete & insert for podcast table
-    - [] add functions, create, delete & insert for media table
+    - [x] add functions, create, delete & insert for media table
     - [x] add some prefix to track & podcast id
 - [] output logs after running the inserts should be a count of rows inserted for each table & also save the id of failed/errored inserts in an "audit.txt" file
 - [] write tests

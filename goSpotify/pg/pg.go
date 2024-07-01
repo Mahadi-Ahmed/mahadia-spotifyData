@@ -75,10 +75,12 @@ func InsertIntoDb(pg *Postgres, ctx context.Context, data models.SpotifyData) er
 		return err
 	}
 
-	// TODO: insert media table
-
 	if err := InsertPlaybackValues(pg, ctx, data); err != nil {
 		fmt.Println("error insert playback values")
+		return err
+	}
+	if err := InsertMediaValues(pg, ctx, data); err != nil {
+		fmt.Println("error insert media values")
 		return err
 	}
 
@@ -161,10 +163,42 @@ func InsertPodcastValues(pg *Postgres, ctx context.Context, data models.SpotifyD
 	return nil
 }
 
-// func InsertMediaValues(pg *Postgres, ctx context.Context, data models.SpotifyData) error {
-//   query := `insert into `
-//   return nil
-// }
+func InsertMediaValues(pg *Postgres, ctx context.Context, data models.SpotifyData) error {
+	query := `insert into media (
+    playback_id,
+    media_id,
+    media_type
+  ) values ($1, $2, $3)`
+
+	mediaType, mediaId := getMediaType(data)
+	playbackId, err := generatePlaybackId(data.UserName, data.Timestamp, mediaId)
+	if err != nil {
+		return err
+	}
+
+	mediaValues := models.Media{
+		PlaybackId: playbackId,
+		MediaId:    mediaId,
+		MediaType:  mediaType,
+	}
+
+	fmt.Printf("Inserting  into media: %v\n", playbackId)
+	fmt.Printf("media_id: %v", mediaId)
+	fmt.Printf("media_type %v", mediaType)
+	fmt.Println()
+	_, errDb := pg.Db.Exec(
+		ctx, query,
+		mediaValues.PlaybackId,
+		mediaValues.MediaId,
+		mediaValues.MediaType,
+	)
+
+	if errDb != nil {
+		return errDb
+	}
+
+	return nil
+}
 
 func InsertPlaybackValues(pg *Postgres, ctx context.Context, data models.SpotifyData) error {
 	query := `INSERT INTO playback (
@@ -191,7 +225,6 @@ func InsertPlaybackValues(pg *Postgres, ctx context.Context, data models.Spotify
 	if err != nil {
 		return err
 	}
-	fmt.Println(playbackId)
 
 	playbackValues := models.Playback{
 		Id:                 playbackId,
@@ -319,16 +352,10 @@ func (pg *Postgres) CreateTracksTable(ctx context.Context) error {
 
 func (pg *Postgres) CreateMediaTable(ctx context.Context) error {
 	query := `create table if not exists media (
-    playback_id int,
+    playback_id varchar,
     media_id varchar,
     media_type varchar,
-    foreign key (playback_id) references playback(id),
-    constraint fk_media_track
-      foreign key (media_id)
-      references track(track_id),
-    constraint fk_media_podcast
-      foreign key (media_id)
-      references podcast(podcast_id)
+    foreign key (playback_id) references playback(id)
   )`
 
 	_, err := pg.Db.Exec(ctx, query)
