@@ -7,6 +7,7 @@ import (
 	"io"
 	"log"
 	"os"
+  "time"
 
 	"github.com/joho/godotenv"
 	"github.com/mahadia/mahadia-spotifyData/goSpotify/models"
@@ -21,6 +22,7 @@ func init() {
 }
 
 func main() {
+  startTime := time.Now()
 	var (
 		dbHost     = os.Getenv("DB_HOST")
 		dbUser     = os.Getenv("DB_USER")
@@ -59,6 +61,8 @@ func main() {
 			fmt.Println(err)
 		}
 	}
+  elapsedTime := time.Since(startTime)
+  fmt.Printf("Total time to seed DB: %s\n", elapsedTime)
 }
 
 func processSpotifyData() ([]models.SpotifyData, error) {
