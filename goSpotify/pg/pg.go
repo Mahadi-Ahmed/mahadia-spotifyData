@@ -3,9 +3,10 @@ package pg
 import (
 	"context"
 	"fmt"
+	"strconv"
 	"strings"
 	"sync"
-  "time"
+	"time"
 
 	"github.com/jackc/pgx/v5/pgconn"
 	"github.com/jackc/pgx/v5/pgxpool"
@@ -458,13 +459,15 @@ func getUnixTs(dateTime string) (int64, error) {
     return 0, err
   }
 
-  ts := t.Unix()
-  return ts, nil
+func getUnixTs(dateTime time.Time) string {
+	unixTime := dateTime.Unix()
+	strTime := strconv.FormatInt(unixTime, 10)
+	return strTime
 }
 
 func trimUri(uri *string) string {
 	if uri != nil {
-		return strings.TrimPrefix(*uri, "spotify:episode:")
+		return strings.TrimPrefix(*uri, "spotify:")
 	}
 	return ""
 }
