@@ -168,6 +168,7 @@ func InsertPodcastValues(pg *Postgres, ctx context.Context, data models.SpotifyD
 
 func InsertPlaybackValues(pg *Postgres, ctx context.Context, data models.SpotifyData) error {
 	query := `INSERT INTO playback (
+    id,
 		user_name,
     ts,
     platform,
@@ -183,18 +184,26 @@ func InsertPlaybackValues(pg *Postgres, ctx context.Context, data models.Spotify
     offline_timestamp,
     incognito_mode,
     media_type
-    ) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15)`
+    ) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15, $16)`
 
 	var mediaType string
+	var mediaId string
 	if data.SpotifyTrackUri != nil {
 		mediaType = "track"
+		mediaId = trimUri(data.SpotifyTrackUri)
 	} else {
 		mediaType = "podcast"
+		mediaId = trimUri(data.SpotifyEpisodeUri)
 	}
 
-	fmt.Println(mediaType)
+	playbackId, err := generatePlaybackId(data.UserName, data.Timestamp, mediaId)
+	if err != nil {
+		return err
+	}
+	fmt.Println(playbackId)
 
 	playbackValues := models.Playback{
+		Id:                 playbackId,
 		UserName:           data.UserName,
 		Timestamp:          data.Timestamp,
 		Platform:           data.Platform,
@@ -214,8 +223,9 @@ func InsertPlaybackValues(pg *Postgres, ctx context.Context, data models.Spotify
 
 	fmt.Printf("Inserting playback values for user: %v at time: %v\n", playbackValues.UserName, playbackValues.Timestamp)
 
-	_, err := pg.Db.Exec(
+	_, errDb := pg.Db.Exec(
 		ctx, query,
+		playbackValues.Id,
 		playbackValues.UserName,
 		playbackValues.Timestamp,
 		playbackValues.Platform,
@@ -234,14 +244,14 @@ func InsertPlaybackValues(pg *Postgres, ctx context.Context, data models.Spotify
 	)
 
 	// NOTE: Handle error gracefully while also notifying if there are any collisions
-	if err != nil {
+	if errDb != nil {
 		if pgErr, ok := err.(*pgconn.PgError); ok {
 			if pgErr.Code == "23505" {
 				fmt.Printf("Duplicate playback values for user: %v at time: %v already exists\n", playbackValues.UserName, playbackValues.Timestamp)
 				return nil
 			}
 		}
-		return err
+		return errDb
 	}
 
 	return nil
@@ -342,7 +352,7 @@ func (pg *Postgres) CreateMediaTable(ctx context.Context) error {
 
 func (pg *Postgres) CreatePlaybackTable(ctx context.Context) error {
 	query := `CREATE TABLE IF NOT EXISTS playback (
-    id SERIAL PRIMARY KEY,
+    id VARCHAR PRIMARY KEY,
     user_name VARCHAR,
     ts TIMESTAMP,
     platform VARCHAR,
@@ -453,11 +463,10 @@ func (pg *Postgres) Close() {
 	pg.Db.Close()
 }
 
-func getUnixTs(dateTime string) (int64, error) {
-  t, err := time.Parse(time.RFC3339, dateTime)
-  if err != nil {
-    return 0, err
-  }
+func generatePlaybackId(userName string, dateTime time.Time, mediaId string) (string, error) {
+	ts := getUnixTs(dateTime)
+	return userName + ":" + ts + ":" + mediaId, nil
+}
 
 func getUnixTs(dateTime time.Time) string {
 	unixTime := dateTime.Unix()

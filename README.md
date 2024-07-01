@@ -10,10 +10,10 @@ Use my spotify data somehow
 - [x] Try seeding data with a small subset of spotify data
 - [] Redesign tables:
     - [x] refactor playback table
-    - [] add functions, create, delete & insert for podcast table
+    - [x] dont use serial as pk for playback table, create a composite unique key instead
+    - [x] add functions, create, delete & insert for podcast table
     - [] add functions, create, delete & insert for media table
-    - [] dont use serial as pk for playback table, create a composite unique key instead
-    - [] add some prefix to track & podcast id
+    - [x] add some prefix to track & podcast id
 - [] output logs after running the inserts should be a count of rows inserted for each table & also save the id of failed/errored inserts in an "audit.txt" file
 - [] write tests
 - [] batch db inserts
@@ -40,7 +40,7 @@ which will return information about that specific track, the track response will
 - ratio of shuffle
 - When did i first start to listen on spotify
 - total time spent listening
-- longest "sessien" of listening to music, in a day
+- longest "session" of listening to music, in a day
 - longest streak of consecutive days of listening to music
 
 - Search for a song, show first time i listened to that song
