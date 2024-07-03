@@ -346,7 +346,7 @@ func (pg *Postgres) CreateTracksTable(ctx context.Context) error {
 
 func (pg *Postgres) CreateMediaTable(ctx context.Context) error {
 	query := `create table if not exists media (
-    playback_id varchar,
+    playback_id varchar primary key,
     media_id varchar,
     media_type varchar,
     foreign key (playback_id) references playback(id)
