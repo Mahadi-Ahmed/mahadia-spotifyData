@@ -19,6 +19,7 @@ Use my spotify data somehow
 - [] output logs after running the inserts should be a count of rows inserted for each table & also save the id of failed/errored inserts in an "audit.txt" file
 - [] look into adding progress indicator
 - [] batch db inserts
+- [] add some kind of relationship between media to track or podcast table in schema level
 - [] parallelise the functions
 - [] consider adding contraint to media table if needed
 - [] look into retry mechanism for failed inserts
