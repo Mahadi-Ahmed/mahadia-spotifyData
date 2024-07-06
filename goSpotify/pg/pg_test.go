@@ -21,7 +21,13 @@ type PostgresTestSuite struct {
 }
 
 
-func (suite *PostgresTestSuite) TestCreateTable() {
+func (suite *PostgresTestSuite) TestDropAllTable() {
+  t := suite.T()
+  err := suite.pg.DropAllTables(suite.ctx)
+  assert.NoError(t, err , "Failed to create all tables")
+}
+
+func (suite *PostgresTestSuite) TestCreateAllTable() {
   t := suite.T()
   err := suite.pg.CreateAllTables(suite.ctx)
   assert.NoError(t, err , "Failed to create all tables")
