@@ -2,19 +2,34 @@ package pg
 
 import (
 	"context"
+	"log"
 	"testing"
 	"time"
 
 	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/suite"
 	"github.com/testcontainers/testcontainers-go"
 	"github.com/testcontainers/testcontainers-go/modules/postgres"
 	"github.com/testcontainers/testcontainers-go/wait"
 )
 
+type PostgresTestSuite struct {
+	suite.Suite
+	ctx       context.Context
+	container *postgres.PostgresContainer
+	pg        *Postgres
+}
 
-func TestNewPG(t *testing.T) {
-	ctx := context.Background()
-	pgContainer, err := postgres.RunContainer(ctx,
+
+func (suite *PostgresTestSuite) TestCreateTable() {
+  t := suite.T()
+  err := suite.pg.CreateAllTables(suite.ctx)
+  assert.NoError(t, err , "Failed to create all tables")
+}
+
+func (suite *PostgresTestSuite) SetupSuite() {
+	suite.ctx = context.Background()
+	pgContainer, err := postgres.RunContainer(suite.ctx,
 		testcontainers.WithImage("postgres:16.3-alpine"),
 		postgres.WithDatabase("test-db"),
 		postgres.WithUsername("postgres"),
@@ -24,23 +39,30 @@ func TestNewPG(t *testing.T) {
 				WithOccurrence(2).WithStartupTimeout(5*time.Second)),
 	)
 	if err != nil {
-		t.Fatal(err)
+		log.Fatal(err)
 	}
 
-	t.Cleanup(func() {
-		if err := pgContainer.Terminate(ctx); err != nil {
-			t.Fatalf("failed to terminate pgContainer: %s", err)
-		}
-	})
+	suite.container = pgContainer
 
-	connStr, err := pgContainer.ConnectionString(ctx, "sslmode=disable")
-	assert.NoError(t, err)
+	connStr, err := pgContainer.ConnectionString(suite.ctx, "sslmode=disable")
+	if err != nil {
+		log.Fatal(err)
+	}
 
-  spotifyTestDb, err := NewPG(ctx, connStr)
-	assert.NoError(t, err, "Failed to connect to database")
-	assert.NotNil(t, spotifyTestDb, "PG instance should not be nil")
+	pgDb, err := NewPG(suite.ctx, connStr)
+	if err != nil {
+		log.Fatal(err)
+	}
+	// suite.pg = *pgDb
+	suite.pg = pgDb
+}
 
-  // Test CreateAllTables
-  err = spotifyTestDb.CreateAllTables(ctx)
-  assert.NoError(t, err, "Failed to create all tables")
+func (suite *PostgresTestSuite) TearDownSuite() {
+	if err := suite.container.Terminate(suite.ctx); err != nil {
+		log.Fatalf("error terminating postgres container: %s", err)
+	}
+}
+
+func TestPostgresSpotifyTestSuite(t *testing.T) {
+	suite.Run(t, new(PostgresTestSuite))
 }
