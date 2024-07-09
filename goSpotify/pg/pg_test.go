@@ -2,6 +2,7 @@ package pg
 
 import (
 	"context"
+	"fmt"
 	"log"
 	"testing"
 	"time"
@@ -61,6 +62,19 @@ func (suite *PostgresTestSuite) TestInsertTrackIntoDbTable() {
 	assert.Equal(t, 0, countPodcast, "podcast was not inserted correctly")
 	assert.Equal(t, 1, countUser, "user was not inserted correctly")
 	assert.Equal(t, 1, countMedia, "media was not inserted correctly")
+}
+
+func (suite *PostgresTestSuite) TestInsertAllCollision() {
+  suite.SetupTest()
+  fmt.Println()
+  t := suite.T()
+  firstInsert := suite.pg.InsertIntoDb(suite.ctx, pg_testhelper.TestDataValidTrack)
+  secondInsert := suite.pg.InsertIntoDb(suite.ctx, pg_testhelper.TestDataValidTrack)
+  
+  fmt.Println("First insert: ", firstInsert)
+  fmt.Println("Second insert: ", secondInsert)
+  assert.NoError(t, firstInsert, "Failed first insert")
+  assert.Error(t, secondInsert, "Failed to error on second insert")
 }
 
 func (suite *PostgresTestSuite) TestInsertPodcastIntoDbTable() {
