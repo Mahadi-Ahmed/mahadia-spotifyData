@@ -59,7 +59,7 @@ func (pg *Postgres) CreateAllTables(ctx context.Context) error {
 	return nil
 }
 
-func InsertIntoDb(pg *Postgres, ctx context.Context, data models.SpotifyData) error {
+func (pg *Postgres) InsertIntoDb(ctx context.Context, data models.SpotifyData) error {
 	if err := InsertUsersValues(pg, ctx, data); err != nil {
 		fmt.Println("error insert user values")
 		return err
