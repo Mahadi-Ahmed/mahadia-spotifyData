@@ -99,6 +99,15 @@ func (suite *PostgresTestSuite) TearDownSuite() {
 	}
 }
 
+func (suite *PostgresTestSuite) SetupTest() {
+  err := suite.pg.DropAllTables(suite.ctx)
+  // NOTE: Use require to fail fast and exit test suite
+  suite.Require().NoError(err, "Failed to drop all tables")
+
+  err = suite.pg.CreateAllTables(suite.ctx)
+  suite.Require().NoError(err, "Failed to create all tables")
+}
+
 func TestPostgresSpotifyTestSuite(t *testing.T) {
 	suite.Run(t, new(PostgresTestSuite))
 }
