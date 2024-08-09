@@ -22,7 +22,7 @@ services:
     container_name: pgadmin4
     restart: always
     ports:
-      - "8080:80"
+      - "9090:80"
     environment:
       PGADMIN_DEFAULT_EMAIL: test@mahadi.com
       PGADMIN_DEFAULT_PASSWORD: pgadminpassword
