@@ -58,4 +58,6 @@ which will return information about that specific track, the track response will
 1. cd into pg folder
 ```
 go test
+go test -v
 ```
+
