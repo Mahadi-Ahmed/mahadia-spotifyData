@@ -24,6 +24,8 @@ Use my spotify data somehow
 - [] consider adding contraint to media table if needed
 - [] add some kind of relationship between media to track or podcast table in schema level
 
+- [] Look into creating a new service that polls most recently played tracks & appends it to db
+
 ---
 ## Look into what i can use from Spotify's [web api](https://developer.spotify.com/documentation/web-api)
 
@@ -49,3 +51,11 @@ which will return information about that specific track, the track response will
 ## TODO Queries that probably need better data
 - Search for a song, show first time i listened to that song
 - Genre breakdown of all time
+
+## Commands:
+
+### run the tests
+1. cd into pg folder
+```
+go test
+```
