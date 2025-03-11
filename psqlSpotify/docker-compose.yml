@@ -11,6 +11,7 @@ services:
     environment:
       POSTGRES_PASSWORD: mysecretpassword
       POSTGRES_USER: postgres
+      POSTGRES_DB: gopgtest # NOTE: Should be the same name as the db_name in .env for main.go
     volumes:
       - ./psqlDbData:/var/lib/postgresql/data
     networks:
