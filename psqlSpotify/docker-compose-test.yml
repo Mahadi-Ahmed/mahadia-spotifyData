@@ -1,0 +1,21 @@
+services:
+  spotify-test-db:
+    image: postgres:16.3
+    container_name: spotify-test-db
+    ports:
+      - "5679:5432"
+    environment:
+      POSTGRES_PASSWORD: mysecretpassword
+      POSTGRES_USER: postgres
+      POSTGRES_DB: spotify_test
+    networks:
+      - spotify-network
+
+networks:
+  spotify-network:
+    external: true
+
+# NOTE: Create the network if you do not have the psqlSpotify/docker-compose.yml running
+# networks:
+#   spotify-network:
+#     name: spotify-network
