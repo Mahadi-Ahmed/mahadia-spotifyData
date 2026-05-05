@@ -56,6 +56,13 @@ which will return information about that specific track, the track response will
 
 ### run the tests
 1. cd into pg folder
+2. Ensure Docker is running (tests use testcontainers to spin up ephemeral PostgreSQL instances)
+3. If using Colima, set the following environment variables:
+```bash
+export DOCKER_HOST="unix://${HOME}/.colima/default/docker.sock"
+export TESTCONTAINERS_DOCKER_SOCKET_OVERRIDE="/var/run/docker.sock"
+```
+4. Run the tests:
 ```
 go test
 go test -v
