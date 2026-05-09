@@ -3,6 +3,7 @@ package main
 import (
 	"context"
 	"encoding/json"
+	"flag"
 	"fmt"
 	"io"
 	"log"
@@ -14,15 +15,31 @@ import (
 	"github.com/mahadia/mahadia-spotifyData/goSpotify/pg"
 )
 
-func init() {
-	err := godotenv.Load()
-	if err != nil {
-		log.Fatal("Error loading .env file")
-	}
-}
-
 func main() {
 	startTime := time.Now()
+	var prodFlag bool
+	flag.BoolVar(&prodFlag, "prod", false, "prod env")
+	flag.BoolVar(&prodFlag, "p", false, "prod env")
+	var largeFlag bool
+	flag.BoolVar(&largeFlag, "large", false, "Use the large data set")
+	flag.BoolVar(&largeFlag, "l", false, "Use the large data set")
+	flag.Parse()
+
+	if prodFlag {
+		fmt.Println("PROD")
+		err := godotenv.Load()
+		if err != nil {
+			log.Fatal("Error loading .env file")
+		}
+
+	} else {
+		fmt.Println("TEST")
+		err := godotenv.Load(".env.test")
+		if err != nil {
+			log.Fatal("Error loading .env file")
+		}
+	}
+
 	var (
 		dbHost     = os.Getenv("DB_HOST")
 		dbUser     = os.Getenv("DB_USER")
@@ -32,7 +49,6 @@ func main() {
 
 	connStr := fmt.Sprintf("postgres://%s:%s@%s/%s?sslmode=disable", dbUser, dbPassword, dbHost, dbName)
 	pgConn, err := pg.NewPG(context.Background(), connStr)
-	fmt.Println(connStr)
 	if err != nil {
 		log.Fatalf("Failed to connect to database: %v", err)
 	}
@@ -50,7 +66,7 @@ func main() {
 		fmt.Println(err)
 	}
 
-	data, err := processSpotifyData()
+	data, err := processSpotifyData(largeFlag)
 	if err != nil {
 		fmt.Println(err)
 	}
@@ -66,21 +82,26 @@ func main() {
 	fmt.Printf("Total time to seed DB: %s\n", elapsedTime)
 }
 
-func processSpotifyData() ([]models.SpotifyData, error) {
-	jsonFile, err := os.Open("../rawSpotifyData/smallSample.json")
-	// jsonFile, err := os.Open("../rawSpotifyData/MyDataGo/endsong_1.json")
-	// jsonFile, err := os.Open("../rawSpotifyData/endsong_0.json")
+func processSpotifyData(largeFlag bool) ([]models.SpotifyData, error) {
+	var file string
+	if largeFlag {
+		file = "../rawSpotifyData/endsong_0.json"
+	} else {
+		file = "../rawSpotifyData/smallSample.json"
+	}
+
+	jsonFile, err := os.Open(file)
 	if err != nil {
 		fmt.Println(err)
 		return nil, err
 	}
 	defer jsonFile.Close()
 
+	io.MultiReader()
 	byteValue, err := io.ReadAll(jsonFile)
 	var spotifyMiniData []models.SpotifyData
 
 	err = json.Unmarshal(byteValue, &spotifyMiniData)
-	// fmt.Println(spotifyMiniData)
 	if err != nil {
 		fmt.Println("kaos with unmarshal spotify data", err)
 		return nil, err
