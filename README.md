@@ -16,15 +16,16 @@ Use my spotify data somehow
     - [x] add functions, create, delete & insert for media table
     - [x] add some prefix to track & podcast id
 - [x] write tests
-- [] output logs after running the inserts should be a count of rows inserted for each table & also save the id of failed/errored inserts in an "audit.txt" file
-- [] batch db inserts
-- [] look into retry mechanism for failed inserts
-- [] parallelise the functions
-- [] look into adding progress indicator
-- [] consider adding contraint to media table if needed
-- [] add some kind of relationship between media to track or podcast table in schema level
+- [ ] remove dotenv package & replace with mise
+- [ ] output logs after running the inserts should be a count of rows inserted for each table & also save the id of failed/errored inserts in an "audit.txt" file
+- [ ] batch db inserts
+- [ ] look into retry mechanism for failed inserts
+- [ ] parallelise the functions
+- [ ] look into adding progress indicator
+- [ ] consider adding contraint to media table if needed
+- [ ] add some kind of relationship between media to track or podcast table in schema level
 
-- [] Look into creating a new service that polls most recently played tracks & appends it to db
+- [ ] Look into creating a new service that polls most recently played tracks & appends it to db
 
 ---
 ## Look into what i can use from Spotify's [web api](https://developer.spotify.com/documentation/web-api)
