@@ -7,7 +7,7 @@ import (
 	"io"
 	"log"
 	"os"
-  "time"
+	"time"
 
 	"github.com/joho/godotenv"
 	"github.com/mahadia/mahadia-spotifyData/goSpotify/models"
@@ -22,7 +22,7 @@ func init() {
 }
 
 func main() {
-  startTime := time.Now()
+	startTime := time.Now()
 	var (
 		dbHost     = os.Getenv("DB_HOST")
 		dbUser     = os.Getenv("DB_USER")
@@ -32,6 +32,7 @@ func main() {
 
 	connStr := fmt.Sprintf("postgres://%s:%s@%s/%s?sslmode=disable", dbUser, dbPassword, dbHost, dbName)
 	pgConn, err := pg.NewPG(context.Background(), connStr)
+	fmt.Println(connStr)
 	if err != nil {
 		log.Fatalf("Failed to connect to database: %v", err)
 	}
@@ -56,13 +57,13 @@ func main() {
 
 	for _, v := range data {
 		err := pgConn.InsertIntoDb(context.Background(), v)
-    fmt.Println()
+		fmt.Println()
 		if err != nil {
 			fmt.Println(err)
 		}
 	}
-  elapsedTime := time.Since(startTime)
-  fmt.Printf("Total time to seed DB: %s\n", elapsedTime)
+	elapsedTime := time.Since(startTime)
+	fmt.Printf("Total time to seed DB: %s\n", elapsedTime)
 }
 
 func processSpotifyData() ([]models.SpotifyData, error) {
@@ -79,7 +80,7 @@ func processSpotifyData() ([]models.SpotifyData, error) {
 	var spotifyMiniData []models.SpotifyData
 
 	err = json.Unmarshal(byteValue, &spotifyMiniData)
-  // fmt.Println(spotifyMiniData)
+	// fmt.Println(spotifyMiniData)
 	if err != nil {
 		fmt.Println("kaos with unmarshal spotify data", err)
 		return nil, err

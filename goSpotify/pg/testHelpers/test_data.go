@@ -31,6 +31,30 @@ var (
 		SpotifyEpisodeUri:             nil,
 	}
 
+	TestDataValidTrack2 = models.SpotifyData{
+		Timestamp:                     parseTime("2019-09-20T14:04:37Z"),
+		UserName:                      "mahadi4",
+		Platform:                      "Android OS 8.1.0 API 27 (OnePlus, ONEPLUS A6003)",
+		MsPlayed:                      207365,
+		ConnCountry:                   "SE",
+		IpAddrDecrypted:               "94.234.39.50",
+		UserAgentDecrypted:            "unknown",
+		ReasonStart:                   "clickrow",
+		ReasonEnd:                     "endplay",
+		Shuffle:                       false,
+		Skipped:                       false,
+		Offline:                       false,
+		OfflineTimestamp:              1531607758299,
+		IncognitoMode:                 false,
+		SpotifyTrackUri:               stringPtr("spotify:track:3clX2NMmjaAHmBjeTSa9vV"),
+		MasterMetadataTrackName:       stringPtr("Actin Crazy"),
+		MasterMetadataAlbumArtistName: stringPtr("Action Bronson"),
+		MasterMetadataAlbumAlbumName:  stringPtr("Mr. Wonderful"),
+		EpisodeName:                   nil,
+		EpisodeShowName:               nil,
+		SpotifyEpisodeUri:             nil,
+	}
+
 	TestDataValidPodcast = models.SpotifyData{
 		Timestamp:                     parseTime("2020-09-03T09:25:47Z"),
 		UserName:                      "mahadi4",

@@ -35,7 +35,7 @@ func (suite *PostgresTestSuite) TestCreateAllTable() {
 }
 
 func (suite *PostgresTestSuite) TestInsertTrackIntoDbTable() {
-  suite.SetupTest()
+	suite.SetupTest()
 	t := suite.T()
 	err := suite.pg.InsertIntoDb(suite.ctx, pg_testhelper.TestDataValidTrack)
 	assert.NoError(t, err, "Failed funciton InsertIntoDb")
@@ -49,7 +49,7 @@ func (suite *PostgresTestSuite) TestInsertTrackIntoDbTable() {
 	errCountPlayback := suite.pg.Db.QueryRow(suite.ctx, "select count(*) from playback").Scan(&countPlayback)
 	errCountTrack := suite.pg.Db.QueryRow(suite.ctx, "select count(*) from track").Scan(&countTrack)
 	errCountPodcast := suite.pg.Db.QueryRow(suite.ctx, "select count(*) from podcast").Scan(&countPodcast)
-	errCountUser := suite.pg.Db.QueryRow(suite.ctx, "select count(*) from user").Scan(&countUser)
+	errCountUser := suite.pg.Db.QueryRow(suite.ctx, "select count(*) from users").Scan(&countUser)
 	errCountMedia := suite.pg.Db.QueryRow(suite.ctx, "select count(*) from media").Scan(&countMedia)
 	assert.NoError(t, errCountPlayback, "Failed to query playback")
 	assert.NoError(t, errCountTrack, "Failed to query track")
@@ -65,20 +65,20 @@ func (suite *PostgresTestSuite) TestInsertTrackIntoDbTable() {
 }
 
 func (suite *PostgresTestSuite) TestInsertAllCollision() {
-  suite.SetupTest()
-  fmt.Println()
-  t := suite.T()
-  firstInsert := suite.pg.InsertIntoDb(suite.ctx, pg_testhelper.TestDataValidTrack)
-  secondInsert := suite.pg.InsertIntoDb(suite.ctx, pg_testhelper.TestDataValidTrack)
-  
-  fmt.Println("First insert: ", firstInsert)
-  fmt.Println("Second insert: ", secondInsert)
-  assert.NoError(t, firstInsert, "Failed first insert")
-  assert.Error(t, secondInsert, "Failed to error on second insert")
+	suite.SetupTest()
+	fmt.Println()
+	t := suite.T()
+	firstInsert := suite.pg.InsertIntoDb(suite.ctx, pg_testhelper.TestDataValidTrack)
+	secondInsert := suite.pg.InsertIntoDb(suite.ctx, pg_testhelper.TestDataValidTrack)
+	thirdInsert := suite.pg.InsertIntoDb(suite.ctx, pg_testhelper.TestDataValidTrack2)
+
+	assert.NoError(t, firstInsert, "Failed first insert")
+	assert.NoError(t, secondInsert, "Failed to error on second insert")
+	assert.NoError(t, thirdInsert, "Failed to error on second insert")
 }
 
 func (suite *PostgresTestSuite) TestInsertPodcastIntoDbTable() {
-  suite.SetupTest()
+	suite.SetupTest()
 	t := suite.T()
 	err := suite.pg.InsertIntoDb(suite.ctx, pg_testhelper.TestDataValidPodcast)
 	assert.NoError(t, err, "Failed funciton InsertIntoDb")
@@ -144,12 +144,12 @@ func (suite *PostgresTestSuite) TearDownSuite() {
 }
 
 func (suite *PostgresTestSuite) SetupTest() {
-  err := suite.pg.DropAllTables(suite.ctx)
-  // NOTE: Use require to fail fast and exit test suite
-  suite.Require().NoError(err, "Failed to drop all tables")
+	err := suite.pg.DropAllTables(suite.ctx)
+	// NOTE: Use require to fail fast and exit test suite
+	suite.Require().NoError(err, "Failed to drop all tables")
 
-  err = suite.pg.CreateAllTables(suite.ctx)
-  suite.Require().NoError(err, "Failed to create all tables")
+	err = suite.pg.CreateAllTables(suite.ctx)
+	suite.Require().NoError(err, "Failed to create all tables")
 }
 
 func TestPostgresSpotifyTestSuite(t *testing.T) {
