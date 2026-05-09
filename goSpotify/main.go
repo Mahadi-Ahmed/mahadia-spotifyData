@@ -99,6 +99,10 @@ func processSpotifyData(largeFlag bool) ([]models.SpotifyData, error) {
 
 	io.MultiReader()
 	byteValue, err := io.ReadAll(jsonFile)
+	if err != nil {
+		fmt.Println("kaos with reading json file", err)
+		return nil, err
+	}
 	var spotifyMiniData []models.SpotifyData
 
 	err = json.Unmarshal(byteValue, &spotifyMiniData)

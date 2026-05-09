@@ -92,7 +92,7 @@ func (suite *PostgresTestSuite) TestInsertPodcastIntoDbTable() {
 	errCountPlayback := suite.pg.Db.QueryRow(suite.ctx, "select count(*) from playback").Scan(&countPlayback)
 	errCountTrack := suite.pg.Db.QueryRow(suite.ctx, "select count(*) from track").Scan(&countTrack)
 	errCountPodcast := suite.pg.Db.QueryRow(suite.ctx, "select count(*) from podcast").Scan(&countPodcast)
-	errCountUser := suite.pg.Db.QueryRow(suite.ctx, "select count(*) from user").Scan(&countUser)
+	errCountUser := suite.pg.Db.QueryRow(suite.ctx, "select count(*) from users").Scan(&countUser)
 	errCountMedia := suite.pg.Db.QueryRow(suite.ctx, "select count(*) from media").Scan(&countMedia)
 	assert.NoError(t, errCountPlayback, "Failed to query playback")
 	assert.NoError(t, errCountTrack, "Failed to query track")
