@@ -79,7 +79,7 @@ func main() {
 		}
 	}
 	elapsedTime := time.Since(startTime)
-	fmt.Printf("Total time to seed DB: %s\n", elapsedTime)
+	fmt.Printf("Total time to seed DB: %s with %d items\n", elapsedTime, len(data))
 }
 
 func processSpotifyData(largeFlag bool) ([]models.SpotifyData, error) {
