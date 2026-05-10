@@ -7,6 +7,7 @@ import (
 	"fmt"
 	"io"
 	"log"
+	"log/slog"
 	"os"
 	"time"
 
@@ -17,9 +18,13 @@ import (
 
 func main() {
 	startTime := time.Now()
+	logger, logFile := newLogger()
+	defer logFile.Close()
+
 	var prodFlag bool
 	flag.BoolVar(&prodFlag, "prod", false, "prod env")
 	flag.BoolVar(&prodFlag, "p", false, "prod env")
+
 	var largeFlag bool
 	flag.BoolVar(&largeFlag, "large", false, "Use the large data set")
 	flag.BoolVar(&largeFlag, "l", false, "Use the large data set")
@@ -29,14 +34,16 @@ func main() {
 		fmt.Println("PROD")
 		err := godotenv.Load()
 		if err != nil {
-			log.Fatal("Error loading .env file")
+			logger.Error("Error loading .env file")
+			os.Exit(1)
 		}
 
 	} else {
-		fmt.Println("TEST")
+		logger.Info("Loading env files", "env", "test")
 		err := godotenv.Load(".env.test")
 		if err != nil {
-			log.Fatal("Error loading .env file")
+			logger.Error("Error loading .env file")
+			os.Exit(1)
 		}
 	}
 
@@ -48,41 +55,46 @@ func main() {
 	)
 
 	connStr := fmt.Sprintf("postgres://%s:%s@%s/%s?sslmode=disable", dbUser, dbPassword, dbHost, dbName)
-	pgConn, err := pg.NewPG(context.Background(), connStr)
+	pgConn, err := pg.NewPG(context.Background(), connStr, logger)
 	if err != nil {
-		log.Fatalf("Failed to connect to database: %v", err)
+		logger.Error("Failed to connect to database", "error", err)
+		os.Exit(1)
 	}
+
 	defer pgConn.Close()
 
 	// NOTE: Drop tables
 	err = pgConn.DropAllTables(context.Background())
 	if err != nil {
-		fmt.Println(err)
+		logger.Error("Failed to drop tables", "error", err)
+		os.Exit(1)
 	}
 
 	// NOTE: Create tables
 	err = pgConn.CreateAllTables(context.Background())
 	if err != nil {
-		fmt.Println(err)
+		logger.Error("Failed to create tables", "error", err)
+		os.Exit(1)
 	}
 
-	data, err := processSpotifyData(largeFlag)
+	data, err := processSpotifyData(largeFlag, logger)
 	if err != nil {
-		fmt.Println(err)
+		logger.Error("failed to process spotify data", "error", err)
+		os.Exit(1)
 	}
 
 	for _, v := range data {
 		err := pgConn.InsertIntoDb(context.Background(), v)
 		fmt.Println()
 		if err != nil {
-			fmt.Println(err)
+			logger.Error("failed insert into db", "error", err)
 		}
 	}
-	elapsedTime := time.Since(startTime)
-	fmt.Printf("Total time to seed DB: %s with %d items\n", elapsedTime, len(data))
+	elapsedTime := time.Since(startTime).Seconds()
+	logger.Info("Seeding DB finished", "duration", elapsedTime, "items", len(data))
 }
 
-func processSpotifyData(largeFlag bool) ([]models.SpotifyData, error) {
+func processSpotifyData(largeFlag bool, logger *slog.Logger) ([]models.SpotifyData, error) {
 	var file string
 	if largeFlag {
 		file = "../rawSpotifyData/endsong_0.json"
@@ -92,24 +104,48 @@ func processSpotifyData(largeFlag bool) ([]models.SpotifyData, error) {
 
 	jsonFile, err := os.Open(file)
 	if err != nil {
-		fmt.Println(err)
+		logger.Error("error parsing data", "error", err)
 		return nil, err
 	}
 	defer jsonFile.Close()
 
-	io.MultiReader()
 	byteValue, err := io.ReadAll(jsonFile)
 	if err != nil {
-		fmt.Println("kaos with reading json file", err)
+		logger.Error("error reading data", "error", err)
 		return nil, err
 	}
 	var spotifyMiniData []models.SpotifyData
 
 	err = json.Unmarshal(byteValue, &spotifyMiniData)
 	if err != nil {
-		fmt.Println("kaos with unmarshal spotify data", err)
+		logger.Error("failed to unmarshal spotify data", "error", err)
 		return nil, err
 	}
 
 	return spotifyMiniData, nil
+}
+
+func newLogger() (*slog.Logger, *os.File) {
+	logDir := "logs"
+	err := os.MkdirAll(logDir, 0755)
+	if err != nil {
+		log.Fatalf("failed to create log directory")
+	}
+	logFilePath := fmt.Sprintf("%s/logs.txt", logDir)
+	logFile, err := os.OpenFile(logFilePath, os.O_CREATE|os.O_WRONLY|os.O_TRUNC, 0644)
+	if err != nil {
+		log.Fatalf("Failed to open file %v: ", err)
+	}
+
+	writer := io.MultiWriter(os.Stdout, logFile)
+	handler := slog.NewJSONHandler(writer, &slog.HandlerOptions{
+		ReplaceAttr: func(groups []string, a slog.Attr) slog.Attr {
+			if a.Key == slog.TimeKey {
+				return slog.Attr{}
+			}
+			return a
+		},
+	})
+
+	return slog.New(handler), logFile
 }

@@ -4,6 +4,7 @@ import (
 	"context"
 	"fmt"
 	"log"
+	"log/slog"
 	"testing"
 	"time"
 
@@ -46,11 +47,11 @@ func (suite *PostgresTestSuite) TestInsertTrackIntoDbTable() {
 	var countUser int
 	var countMedia int
 
-	errCountPlayback := suite.pg.Db.QueryRow(suite.ctx, "select count(*) from playback").Scan(&countPlayback)
-	errCountTrack := suite.pg.Db.QueryRow(suite.ctx, "select count(*) from track").Scan(&countTrack)
-	errCountPodcast := suite.pg.Db.QueryRow(suite.ctx, "select count(*) from podcast").Scan(&countPodcast)
-	errCountUser := suite.pg.Db.QueryRow(suite.ctx, "select count(*) from users").Scan(&countUser)
-	errCountMedia := suite.pg.Db.QueryRow(suite.ctx, "select count(*) from media").Scan(&countMedia)
+	errCountPlayback := suite.pg.db.QueryRow(suite.ctx, "select count(*) from playback").Scan(&countPlayback)
+	errCountTrack := suite.pg.db.QueryRow(suite.ctx, "select count(*) from track").Scan(&countTrack)
+	errCountPodcast := suite.pg.db.QueryRow(suite.ctx, "select count(*) from podcast").Scan(&countPodcast)
+	errCountUser := suite.pg.db.QueryRow(suite.ctx, "select count(*) from users").Scan(&countUser)
+	errCountMedia := suite.pg.db.QueryRow(suite.ctx, "select count(*) from media").Scan(&countMedia)
 	assert.NoError(t, errCountPlayback, "Failed to query playback")
 	assert.NoError(t, errCountTrack, "Failed to query track")
 	assert.NoError(t, errCountPodcast, "Failed to query podcast")
@@ -89,11 +90,11 @@ func (suite *PostgresTestSuite) TestInsertPodcastIntoDbTable() {
 	var countUser int
 	var countMedia int
 
-	errCountPlayback := suite.pg.Db.QueryRow(suite.ctx, "select count(*) from playback").Scan(&countPlayback)
-	errCountTrack := suite.pg.Db.QueryRow(suite.ctx, "select count(*) from track").Scan(&countTrack)
-	errCountPodcast := suite.pg.Db.QueryRow(suite.ctx, "select count(*) from podcast").Scan(&countPodcast)
-	errCountUser := suite.pg.Db.QueryRow(suite.ctx, "select count(*) from users").Scan(&countUser)
-	errCountMedia := suite.pg.Db.QueryRow(suite.ctx, "select count(*) from media").Scan(&countMedia)
+	errCountPlayback := suite.pg.db.QueryRow(suite.ctx, "select count(*) from playback").Scan(&countPlayback)
+	errCountTrack := suite.pg.db.QueryRow(suite.ctx, "select count(*) from track").Scan(&countTrack)
+	errCountPodcast := suite.pg.db.QueryRow(suite.ctx, "select count(*) from podcast").Scan(&countPodcast)
+	errCountUser := suite.pg.db.QueryRow(suite.ctx, "select count(*) from users").Scan(&countUser)
+	errCountMedia := suite.pg.db.QueryRow(suite.ctx, "select count(*) from media").Scan(&countMedia)
 	assert.NoError(t, errCountPlayback, "Failed to query playback")
 	assert.NoError(t, errCountTrack, "Failed to query track")
 	assert.NoError(t, errCountPodcast, "Failed to query podcast")
@@ -129,11 +130,10 @@ func (suite *PostgresTestSuite) SetupSuite() {
 		log.Fatal(err)
 	}
 
-	pgDb, err := NewPG(suite.ctx, connStr)
+	pgDb, err := NewPG(suite.ctx, connStr, slog.Default())
 	if err != nil {
 		log.Fatal(err)
 	}
-	// suite.pg = *pgDb
 	suite.pg = pgDb
 }
 
