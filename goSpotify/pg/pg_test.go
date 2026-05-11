@@ -113,6 +113,9 @@ func (suite *PostgresTestSuite) TestInsertOffline() {
 	t := suite.T()
 	firstInsert := suite.pg.InsertIntoDb(suite.ctx, pg_testhelper.TestDataValidTrackOffline1)
 	assert.NoError(t, firstInsert, "Should succeed")
+	var d time.Time
+	suite.pg.db.QueryRow(suite.ctx, "select ts from playback").Scan(&d)
+	assert.Equal(t, d, time.Time(time.Date(2017, time.February, 16, 8, 59, 52, 56000000, time.UTC)))
 }
 
 func (suite *PostgresTestSuite) TestInsertOfflineCollision() {
