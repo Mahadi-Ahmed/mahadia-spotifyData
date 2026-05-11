@@ -108,6 +108,22 @@ func (suite *PostgresTestSuite) TestInsertPodcastIntoDbTable() {
 	assert.Equal(t, 1, countMedia, "media was not inserted correctly")
 }
 
+func (suite *PostgresTestSuite) TestInsertOffline() {
+	suite.SetupTest()
+	t := suite.T()
+	firstInsert := suite.pg.InsertIntoDb(suite.ctx, pg_testhelper.TestDataValidTrackOffline1)
+	assert.NoError(t, firstInsert, "Should succeed")
+}
+
+func (suite *PostgresTestSuite) TestInsertOfflineCollision() {
+	suite.SetupTest()
+	t := suite.T()
+	firstInsert := suite.pg.InsertIntoDb(suite.ctx, pg_testhelper.TestDataValidTrackOffline1)
+	secondInsert := suite.pg.InsertIntoDb(suite.ctx, pg_testhelper.TestDataValidTrackOffline2)
+	assert.NoError(t, firstInsert, "Should succeed")
+	assert.NoError(t, secondInsert, "Should succeed")
+}
+
 func (suite *PostgresTestSuite) SetupSuite() {
 	suite.ctx = context.Background()
 	pgContainer, err := postgres.RunContainer(suite.ctx,

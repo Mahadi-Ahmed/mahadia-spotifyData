@@ -84,6 +84,10 @@ func main() {
 	}
 
 	for _, v := range data {
+		if v.Offline {
+			ms := int64(v.OfflineTimestamp)
+			v.Timestamp = time.UnixMilli(ms).UTC()
+		}
 		err := pgConn.InsertIntoDb(context.Background(), v)
 		fmt.Println()
 		if err != nil {
