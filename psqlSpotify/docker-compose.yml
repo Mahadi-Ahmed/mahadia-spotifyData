@@ -1,14 +1,14 @@
 services:
-  spotify-dev-db:
+  spotify-db:
     image: postgres:16.3
-    container_name: spotify-dev-db
+    container_name: spotify-db
     ports:
       - "5678:5432"
     restart: always
     environment:
       POSTGRES_PASSWORD: mysecretpassword
       POSTGRES_USER: postgres
-      POSTGRES_DB: spotify_dev # NOTE: Should be the same name as the db_name in .env for main.go
+      POSTGRES_DB: spotify_db # NOTE: Should be the same name as the db_name in .env for main.go
     volumes:
       - ./psqlDbData:/var/lib/postgresql/data
     networks:
@@ -28,7 +28,7 @@ services:
     networks:
       - spotify-network
     depends_on:
-      - spotify-dev-db
+      - spotify-db
 
 networks:
   spotify-network:
