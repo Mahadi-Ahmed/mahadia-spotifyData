@@ -389,8 +389,7 @@ func (pg *Postgres) CreatePlaybackTable(ctx context.Context) error {
     offline BOOLEAN,
     offline_timestamp BIGINT,
     incognito_mode BOOLEAN,
-    FOREIGN KEY (user_name) REFERENCES users(user_name),
-    CONSTRAINT UNIQUE_USER_TIMESTAMP_COMBO UNIQUE (user_name, ts)
+    FOREIGN KEY (user_name) REFERENCES users(user_name)
   )`
 
 	_, err := pg.db.Exec(ctx, query)

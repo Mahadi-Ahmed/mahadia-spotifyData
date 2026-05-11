@@ -84,7 +84,7 @@ func main() {
 	}
 
 	for _, v := range data {
-		if v.Offline {
+		if v.Offline && v.OfflineTimestamp > 1 {
 			ms := int64(v.OfflineTimestamp)
 			v.Timestamp = time.UnixMilli(ms).UTC()
 		}
