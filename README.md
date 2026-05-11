@@ -17,6 +17,7 @@ Use my spotify data somehow
     - [x] add some prefix to track & podcast id
 - [x] write tests
 - [x] output logs after running the inserts should be a count of rows inserted for each table & also save the id of failed/errored inserts in an "audit.txt" file
+- [ ] Move offline/timestamp normalization into db layer instead
 - [ ] Add flags to handle table creation/drop
 - [ ] batch db inserts (https://medium.com/@pratheek98876/high-performance-bulk-inserts-in-postgresql-using-golang-7860ad11ef49)
 - [ ] look into retry mechanism for failed inserts
