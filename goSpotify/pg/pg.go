@@ -63,6 +63,11 @@ func (pg *Postgres) CreateAllTables(ctx context.Context) error {
 }
 
 func (pg *Postgres) InsertIntoDb(ctx context.Context, data models.SpotifyData) error {
+	// NOTE: using OfflineTimestamp > 1 to not use bad data
+	if data.Offline && data.OfflineTimestamp > 1 {
+		ms := int64(data.OfflineTimestamp)
+		data.Timestamp = time.UnixMilli(ms).UTC()
+	}
 	if err := InsertUsersValues(pg, ctx, data); err != nil {
 		pg.logger.Error("error insert user values")
 		return err

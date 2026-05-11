@@ -56,7 +56,7 @@ var (
 	}
 
 	TestDataValidTrackOffline1 = models.SpotifyData{
-		Timestamp:                     time.UnixMilli(1487235592056).UTC(),
+		Timestamp:                     parseTime("2017-02-19T22:15:52Z"),
 		UserName:                      "mahadi4",
 		Platform:                      "Android OS 7.0 API 24 (OnePlus, ONEPLUS A3003)",
 		MsPlayed:                      691,
@@ -80,7 +80,7 @@ var (
 	}
 
 	TestDataValidTrackOffline2 = models.SpotifyData{
-		Timestamp:                     time.UnixMilli(1487235589259).UTC(),
+		Timestamp:                     parseTime("2017-02-19T22:15:52Z"),
 		UserName:                      "mahadi4",
 		Platform:                      "Android OS 7.0 API 24 (OnePlus, ONEPLUS A3003)",
 		MsPlayed:                      431,
