@@ -98,6 +98,7 @@ func processSpotifyData(largeFlag bool, logger *slog.Logger) ([]models.SpotifyDa
 	var file string
 	if largeFlag {
 		file = "../rawSpotifyData/endsong_0.json"
+		// file = "../rawSpotifyData/MyData/endsong_9.json"
 	} else {
 		file = "../rawSpotifyData/smallSample.json"
 	}

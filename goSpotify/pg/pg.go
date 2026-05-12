@@ -510,9 +510,12 @@ func getMediaType(data models.SpotifyData) (mediaType, mediaId string) {
 	if data.SpotifyTrackUri != nil {
 		mediaType = "track"
 		mediaId = trimUri(data.SpotifyTrackUri)
-	} else {
+	} else if data.SpotifyEpisodeUri != nil {
 		mediaType = "podcast"
 		mediaId = trimUri(data.SpotifyEpisodeUri)
+	} else {
+		mediaId = "unknown"
+		mediaType = "unknown"
 	}
 	return mediaType, mediaId
 }
