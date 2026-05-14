@@ -101,6 +101,7 @@ func processSpotifyData(largeFlag bool, logger *slog.Logger) ([]models.SpotifyDa
 		// file = "../rawSpotifyData/MyData/endsong_9.json"
 	} else {
 		file = "../rawSpotifyData/smallSample.json"
+		// file = "../rawSpotifyData/collisions.json"
 	}
 
 	jsonFile, err := os.Open(file)

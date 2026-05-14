@@ -74,7 +74,7 @@ func (suite *PostgresTestSuite) TestInsertAllCollision() {
 	thirdInsert := suite.pg.InsertIntoDb(suite.ctx, pg_testhelper.TestDataValidTrack2)
 
 	assert.NoError(t, firstInsert, "Should succeed")
-	assert.NoError(t, secondInsert, "Swallow Duplicate insert")
+	assert.Error(t, secondInsert, "Swallow Duplicate insert")
 	assert.NoError(t, thirdInsert, "Should succeed, new entry")
 }
 

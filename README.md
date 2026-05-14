@@ -19,7 +19,8 @@ Use my spotify data somehow
 - [x] output logs after running the inserts should be a count of rows inserted for each table & also save the id of failed/errored inserts in an "audit.txt" file
 - [x] Move offline/timestamp normalization into db layer instead
 - [x] Look into why media is missing in some playback id in the real dataset
-- [ ] add db transactions
+- [x] add db transactions
+- [ ] Denormalize/remove media table into playback
 - [ ] batch db inserts (https://medium.com/@pratheek98876/high-performance-bulk-inserts-in-postgresql-using-golang-7860ad11ef49)
 - [ ] look into retry mechanism for failed inserts
 - [ ] Add flags to handle table creation/drop

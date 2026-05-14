@@ -9,7 +9,7 @@ import (
 	"sync"
 	"time"
 
-	"github.com/jackc/pgx/v5/pgconn"
+	"github.com/jackc/pgx/v5"
 	"github.com/jackc/pgx/v5/pgxpool"
 	"github.com/mahadia/mahadia-spotifyData/goSpotify/models"
 )
@@ -68,34 +68,46 @@ func (pg *Postgres) InsertIntoDb(ctx context.Context, data models.SpotifyData) e
 		ms := int64(data.OfflineTimestamp)
 		data.Timestamp = time.UnixMilli(ms).UTC()
 	}
-	if err := InsertUsersValues(pg, ctx, data); err != nil {
+
+	tx, err := pg.db.BeginTx(ctx, pgx.TxOptions{})
+	if err != nil {
+		pg.logger.Error("starting transaction", "error", err)
+		return err
+	}
+	defer tx.Rollback(ctx)
+
+	if err := InsertUsersValues(ctx, pg, tx, data); err != nil {
 		pg.logger.Error("error insert user values")
 		return err
 	}
 
-	if err := InsertTrackValues(pg, ctx, data); err != nil {
+	if err := InsertTrackValues(ctx, pg, tx, data); err != nil {
 		pg.logger.Error("error insert track values")
 		return err
 	}
 
-	if err := InsertPodcastValues(pg, ctx, data); err != nil {
+	if err := InsertPodcastValues(ctx, pg, tx, data); err != nil {
 		pg.logger.Error("error insert podcast values")
 		return err
 	}
 
-	if err := InsertPlaybackValues(pg, ctx, data); err != nil {
+	if err := InsertPlaybackValues(ctx, pg, tx, data); err != nil {
 		pg.logger.Error("error insert playback values")
 		return err
 	}
-	if err := InsertMediaValues(pg, ctx, data); err != nil {
+	if err := InsertMediaValues(ctx, pg, tx, data); err != nil {
 		pg.logger.Error("error insert media values")
 		return err
+	}
+
+	if err := tx.Commit(ctx); err != nil {
+		return fmt.Errorf("committing transaction: %w", err)
 	}
 
 	return nil
 }
 
-func InsertTrackValues(pg *Postgres, ctx context.Context, data models.SpotifyData) error {
+func InsertTrackValues(ctx context.Context, pg *Postgres, tx pgx.Tx, data models.SpotifyData) error {
 	if data.SpotifyTrackUri == nil {
 		return nil
 	}
@@ -119,7 +131,7 @@ func InsertTrackValues(pg *Postgres, ctx context.Context, data models.SpotifyDat
 
 	pg.logger.Info("Insert into track table", "track", trackValues.TrackName)
 
-	_, err := pg.db.Exec(
+	_, err := tx.Exec(
 		ctx, query,
 		trackValues.TrackID,
 		trackValues.TrackName,
@@ -134,7 +146,7 @@ func InsertTrackValues(pg *Postgres, ctx context.Context, data models.SpotifyDat
 	return nil
 }
 
-func InsertPodcastValues(pg *Postgres, ctx context.Context, data models.SpotifyData) error {
+func InsertPodcastValues(ctx context.Context, pg *Postgres, tx pgx.Tx, data models.SpotifyData) error {
 	if data.SpotifyEpisodeUri == nil {
 		return nil
 	}
@@ -156,7 +168,7 @@ func InsertPodcastValues(pg *Postgres, ctx context.Context, data models.SpotifyD
 
 	pg.logger.Info("insert into podcast table", "podcast", podcastValues.EpisodeName)
 
-	_, err := pg.db.Exec(
+	_, err := tx.Exec(
 		ctx, query,
 		podcastValues.PodcastId,
 		podcastValues.EpisodeName,
@@ -171,7 +183,7 @@ func InsertPodcastValues(pg *Postgres, ctx context.Context, data models.SpotifyD
 	return nil
 }
 
-func InsertMediaValues(pg *Postgres, ctx context.Context, data models.SpotifyData) error {
+func InsertMediaValues(ctx context.Context, pg *Postgres, tx pgx.Tx, data models.SpotifyData) error {
 	query := `insert into media (
     playback_id,
     media_id,
@@ -196,7 +208,7 @@ func InsertMediaValues(pg *Postgres, ctx context.Context, data models.SpotifyDat
 		"mediaType", mediaType,
 	)
 
-	_, errDb := pg.db.Exec(
+	_, errDb := tx.Exec(
 		ctx, query,
 		mediaValues.PlaybackId,
 		mediaValues.MediaId,
@@ -210,7 +222,7 @@ func InsertMediaValues(pg *Postgres, ctx context.Context, data models.SpotifyDat
 	return nil
 }
 
-func InsertPlaybackValues(pg *Postgres, ctx context.Context, data models.SpotifyData) error {
+func InsertPlaybackValues(ctx context.Context, pg *Postgres, tx pgx.Tx, data models.SpotifyData) error {
 	query := `INSERT INTO playback (
     id,
 		user_name,
@@ -255,7 +267,7 @@ func InsertPlaybackValues(pg *Postgres, ctx context.Context, data models.Spotify
 
 	pg.logger.Info("Insert into playback ", "playbackId", playbackId)
 
-	_, errDb := pg.db.Exec(
+	_, errDb := tx.Exec(
 		ctx, query,
 		playbackValues.Id,
 		playbackValues.UserName,
@@ -274,23 +286,14 @@ func InsertPlaybackValues(pg *Postgres, ctx context.Context, data models.Spotify
 		playbackValues.IncognitoMode,
 	)
 
-	// NOTE: Handle error gracefully while also notifying if there are any collisions
 	if errDb != nil {
-		if pgErr, ok := errDb.(*pgconn.PgError); ok {
-			if pgErr.Code == "23505" {
-				pg.logger.Warn("Duplicate playback values for user",
-					"id", playbackValues.Id,
-				)
-				return nil
-			}
-		}
 		return errDb
 	}
 
 	return nil
 }
 
-func InsertUsersValues(pg *Postgres, ctx context.Context, data models.SpotifyData) error {
+func InsertUsersValues(ctx context.Context, pg *Postgres, tx pgx.Tx, data models.SpotifyData) error {
 	query := `insert into users (user_name) 
     values ($1) on conflict (user_name) do nothing`
 
@@ -300,7 +303,7 @@ func InsertUsersValues(pg *Postgres, ctx context.Context, data models.SpotifyDat
 
 	pg.logger.Info("Insert into users table", "user", *userValues.UserName)
 
-	_, err := pg.db.Exec(ctx, query, userValues.UserName)
+	_, err := tx.Exec(ctx, query, userValues.UserName)
 	if err != nil {
 		return err
 	}
