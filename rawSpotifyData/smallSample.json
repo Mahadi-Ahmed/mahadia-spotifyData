@@ -205,5 +205,28 @@
     "offline": false,
     "offline_timestamp": 1502708632918,
     "incognito_mode": false
+  },
+  {
+    "ts": "2017-08-22T18:42:18Z",
+    "username": "mahadi4",
+    "platform": "Android OS 7.1.1 API 25 (OnePlus, ONEPLUS A3003)",
+    "ms_played": 179383,
+    "conn_country": "SE",
+    "ip_addr_decrypted": "77.218.242.182",
+    "user_agent_decrypted": "unknown",
+    "master_metadata_track_name": null,
+    "master_metadata_album_artist_name": null,
+    "master_metadata_album_album_name": null,
+    "spotify_track_uri": null,
+    "episode_name": null,
+    "episode_show_name": null,
+    "spotify_episode_uri": null,
+    "reason_start": "fwdbtn",
+    "reason_end": "trackdone",
+    "shuffle": true,
+    "skipped": null,
+    "offline": false,
+    "offline_timestamp": 1503427160116,
+    "incognito_mode": false
   }
 ]
