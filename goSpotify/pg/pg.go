@@ -56,9 +56,6 @@ func (pg *Postgres) CreateAllTables(ctx context.Context) error {
 	if err := pg.CreatePlaybackTable(ctx); err != nil {
 		return err
 	}
-	if err := pg.CreateMediaTable(ctx); err != nil {
-		return err
-	}
 	return nil
 }
 
@@ -95,10 +92,6 @@ func (pg *Postgres) InsertIntoDb(ctx context.Context, data models.SpotifyData) e
 		pg.logger.Error("error insert playback values")
 		return err
 	}
-	if err := InsertMediaValues(ctx, pg, tx, data); err != nil {
-		pg.logger.Error("error insert media values")
-		return err
-	}
 
 	if err := tx.Commit(ctx); err != nil {
 		return fmt.Errorf("committing transaction: %w", err)
@@ -122,7 +115,7 @@ func InsertTrackValues(ctx context.Context, pg *Postgres, tx pgx.Tx, data models
 
 	trackId := trimUri(data.SpotifyTrackUri)
 	trackValues := models.Track{
-		TrackID:         trackId,
+		TrackID:         *trackId,
 		TrackName:       *data.MasterMetadataTrackName,
 		ArtistName:      *data.MasterMetadataAlbumArtistName,
 		AlbumName:       *data.MasterMetadataAlbumAlbumName,
@@ -160,7 +153,7 @@ func InsertPodcastValues(ctx context.Context, pg *Postgres, tx pgx.Tx, data mode
 
 	podcastId := trimUri(data.SpotifyEpisodeUri)
 	podcastValues := models.Podcast{
-		PodcastId:         podcastId,
+		PodcastId:         *podcastId,
 		EpisodeName:       *data.EpisodeName,
 		EpisodeShowName:   *data.EpisodeShowName,
 		SpotifyEpisodeUri: *data.SpotifyEpisodeUri,
@@ -183,50 +176,13 @@ func InsertPodcastValues(ctx context.Context, pg *Postgres, tx pgx.Tx, data mode
 	return nil
 }
 
-func InsertMediaValues(ctx context.Context, pg *Postgres, tx pgx.Tx, data models.SpotifyData) error {
-	query := `insert into media (
-    playback_id,
-    media_id,
-    media_type
-  ) values ($1, $2, $3)`
-
-	mediaType, mediaId := getMediaType(data)
-	playbackId, err := generatePlaybackId(data.UserName, data.Timestamp, mediaId)
-	if err != nil {
-		return err
-	}
-
-	mediaValues := models.Media{
-		PlaybackId: playbackId,
-		MediaId:    mediaId,
-		MediaType:  mediaType,
-	}
-
-	pg.logger.Info("inserting media record",
-		"playbackId", playbackId,
-		"mediaId", mediaId,
-		"mediaType", mediaType,
-	)
-
-	_, errDb := tx.Exec(
-		ctx, query,
-		mediaValues.PlaybackId,
-		mediaValues.MediaId,
-		mediaValues.MediaType,
-	)
-
-	if errDb != nil {
-		return errDb
-	}
-
-	return nil
-}
-
 func InsertPlaybackValues(ctx context.Context, pg *Postgres, tx pgx.Tx, data models.SpotifyData) error {
 	query := `INSERT INTO playback (
     id,
 		user_name,
     ts,
+    track_id,
+		podcast_id,
     platform,
     ms_played,
     conn_country,
@@ -239,18 +195,22 @@ func InsertPlaybackValues(ctx context.Context, pg *Postgres, tx pgx.Tx, data mod
     offline,
     offline_timestamp,
     incognito_mode
-    ) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15)`
+    ) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15, $16, $17)`
 
 	_, mediaId := getMediaType(data)
-	playbackId, err := generatePlaybackId(data.UserName, data.Timestamp, mediaId)
+	playbackId, err := generatePlaybackId(data.UserName, data.Timestamp, *mediaId)
 	if err != nil {
 		return err
 	}
 
+	trackId := trimUri(data.SpotifyTrackUri)
+	podcastId := trimUri(data.SpotifyEpisodeUri)
 	playbackValues := models.Playback{
 		Id:                 playbackId,
 		UserName:           data.UserName,
 		Timestamp:          data.Timestamp,
+		TrackID:            trackId,
+		PodcastId:          podcastId,
 		Platform:           data.Platform,
 		MsPlayed:           data.MsPlayed,
 		ConnCountry:        data.ConnCountry,
@@ -272,6 +232,8 @@ func InsertPlaybackValues(ctx context.Context, pg *Postgres, tx pgx.Tx, data mod
 		playbackValues.Id,
 		playbackValues.UserName,
 		playbackValues.Timestamp,
+		trackId,
+		podcastId,
 		playbackValues.Platform,
 		playbackValues.MsPlayed,
 		playbackValues.ConnCountry,
@@ -362,29 +324,13 @@ func (pg *Postgres) CreateTracksTable(ctx context.Context) error {
 	return nil
 }
 
-func (pg *Postgres) CreateMediaTable(ctx context.Context) error {
-	query := `create table if not exists media (
-    playback_id varchar,
-    media_id varchar,
-    media_type varchar,
-    foreign key (playback_id) references playback(id)
-  )`
-
-	_, err := pg.db.Exec(ctx, query)
-	if err != nil {
-		return fmt.Errorf("unable to create table media: %w", err)
-	}
-
-	pg.logger.Info("created table media")
-
-	return nil
-}
-
 func (pg *Postgres) CreatePlaybackTable(ctx context.Context) error {
 	query := `CREATE TABLE IF NOT EXISTS playback (
     id VARCHAR PRIMARY KEY,
     user_name VARCHAR,
     ts TIMESTAMP,
+    track_id VARCHAR,
+		podcast_id VARCHAR,
     platform VARCHAR,
     ms_played BIGINT,
     conn_country VARCHAR,
@@ -397,7 +343,12 @@ func (pg *Postgres) CreatePlaybackTable(ctx context.Context) error {
     offline BOOLEAN,
     offline_timestamp BIGINT,
     incognito_mode BOOLEAN,
-    FOREIGN KEY (user_name) REFERENCES users(user_name)
+    FOREIGN KEY (user_name) REFERENCES users(user_name),
+		FOREIGN KEY (track_id) REFERENCES track(track_id),
+		FOREIGN KEY (podcast_id) REFERENCES podcast(podcast_id),
+		CONSTRAINT trackId_or_podcastId_must_exist CHECK (
+			NOT (track_id IS NOT NULL AND podcast_id IS NOT NULL)
+		)
   )`
 
 	_, err := pg.db.Exec(ctx, query)
@@ -411,9 +362,6 @@ func (pg *Postgres) CreatePlaybackTable(ctx context.Context) error {
 }
 
 func (pg *Postgres) DropAllTables(ctx context.Context) error {
-	if err := pg.DropMediaTable(ctx); err != nil {
-		return err
-	}
 	if err := pg.DropPlaybackTable(ctx); err != nil {
 		return err
 	}
@@ -440,17 +388,6 @@ func (pg *Postgres) DropPlaybackTable(ctx context.Context) error {
 	}
 
 	pg.logger.Info("dropped table playback")
-	return nil
-}
-
-func (pg *Postgres) DropMediaTable(ctx context.Context) error {
-	query := `drop table if exists media`
-	_, err := pg.db.Exec(ctx, query)
-	if err != nil {
-		return fmt.Errorf("unable to drop table media: %w", err)
-	}
-
-	pg.logger.Info("dropped table media")
 	return nil
 }
 
@@ -502,14 +439,15 @@ func getUnixTs(dateTime time.Time) string {
 	return strTime
 }
 
-func trimUri(uri *string) string {
+func trimUri(uri *string) *string {
 	if uri != nil {
-		return strings.TrimPrefix(*uri, "spotify:")
+		trimmedUri := strings.TrimPrefix(*uri, "spotify:")
+		return &trimmedUri
 	}
-	return ""
+	return nil
 }
 
-func getMediaType(data models.SpotifyData) (mediaType, mediaId string) {
+func getMediaType(data models.SpotifyData) (mediaType string, mediaId *string) {
 	if data.SpotifyTrackUri != nil {
 		mediaType = "track"
 		mediaId = trimUri(data.SpotifyTrackUri)
@@ -517,7 +455,8 @@ func getMediaType(data models.SpotifyData) (mediaType, mediaId string) {
 		mediaType = "podcast"
 		mediaId = trimUri(data.SpotifyEpisodeUri)
 	} else {
-		mediaId = "unknown"
+		unknown := "unknown"
+		mediaId = &unknown
 		mediaType = "unknown"
 	}
 	return mediaType, mediaId

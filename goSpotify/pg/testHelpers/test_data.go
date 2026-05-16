@@ -18,7 +18,7 @@ var (
 		ReasonStart:                   "clickrow",
 		ReasonEnd:                     "endplay",
 		Shuffle:                       false,
-		Skipped:                       false,
+		Skipped:                       boolPtr(false),
 		Offline:                       false,
 		OfflineTimestamp:              1531607758299,
 		IncognitoMode:                 false,
@@ -42,7 +42,7 @@ var (
 		ReasonStart:                   "clickrow",
 		ReasonEnd:                     "endplay",
 		Shuffle:                       false,
-		Skipped:                       false,
+		Skipped:                       boolPtr(false),
 		Offline:                       false,
 		OfflineTimestamp:              1531607758299,
 		IncognitoMode:                 false,
@@ -66,7 +66,7 @@ var (
 		ReasonStart:                   "fwdbtn",
 		ReasonEnd:                     "fwdbtn",
 		Shuffle:                       true,
-		Skipped:                       false,
+		Skipped:                       boolPtr(false),
 		Offline:                       true,
 		OfflineTimestamp:              1487235592056,
 		IncognitoMode:                 false,
@@ -90,7 +90,7 @@ var (
 		ReasonStart:                   "fwdbtn",
 		ReasonEnd:                     "fwdbtn",
 		Shuffle:                       true,
-		Skipped:                       false,
+		Skipped:                       nil,
 		Offline:                       true,
 		OfflineTimestamp:              1487235589259,
 		IncognitoMode:                 false,
@@ -114,7 +114,7 @@ var (
 		ReasonStart:                   "clickrow",
 		ReasonEnd:                     "logout",
 		Shuffle:                       false,
-		Skipped:                       false,
+		Skipped:                       nil,
 		Offline:                       false,
 		OfflineTimestamp:              1599072060296,
 		IncognitoMode:                 false,
@@ -126,10 +126,38 @@ var (
 		MasterMetadataAlbumAlbumName:  nil,
 		SpotifyTrackUri:               nil,
 	}
+
+	TestDataUnknown = models.SpotifyData{
+		Timestamp:                     parseTime("2017-08-22T18:42:18Z"),
+		UserName:                      "mahadi4",
+		Platform:                      "Android OS 7.1.1 API 25 (OnePlus, ONEPLUS A3003)",
+		MsPlayed:                      179383,
+		ConnCountry:                   "SE",
+		IpAddrDecrypted:               "77.218.242.182",
+		UserAgentDecrypted:            "unknown",
+		ReasonStart:                   "fwdbtn",
+		ReasonEnd:                     "trackdone",
+		Shuffle:                       true,
+		Skipped:                       boolPtr(false),
+		Offline:                       false,
+		OfflineTimestamp:              1503427160116,
+		IncognitoMode:                 false,
+		MasterMetadataTrackName:       nil,
+		MasterMetadataAlbumArtistName: nil,
+		MasterMetadataAlbumAlbumName:  nil,
+		SpotifyTrackUri:               nil,
+		EpisodeName:                   nil,
+		EpisodeShowName:               nil,
+		SpotifyEpisodeUri:             nil,
+	}
 )
 
 func stringPtr(s string) *string {
 	return &s
+}
+
+func boolPtr(b bool) *bool {
+	return &b
 }
 
 func parseTime(s string) time.Time {

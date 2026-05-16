@@ -27,6 +27,8 @@ type Playback struct {
 	Id                 string
 	UserName           string
 	Timestamp          time.Time
+	TrackID            *string
+	PodcastId          *string
 	Platform           string
 	MsPlayed           int
 	ConnCountry        string
@@ -35,16 +37,10 @@ type Playback struct {
 	ReasonStart        string
 	ReasonEnd          string
 	Shuffle            bool
-	Skipped            bool
+	Skipped            *bool
 	Offline            bool
 	OfflineTimestamp   int64
 	IncognitoMode      bool
-}
-
-type Media struct {
-	PlaybackId string
-	MediaId    string
-	MediaType  string
 }
 
 // NOTE: use pointers on possible null values
@@ -66,7 +62,7 @@ type SpotifyData struct {
 	ReasonStart                   string    `json:"reason_start"`
 	ReasonEnd                     string    `json:"reason_end"`
 	Shuffle                       bool      `json:"shuffle"`
-	Skipped                       bool      `json:"skipped"`
+	Skipped                       *bool      `json:"skipped"`
 	Offline                       bool      `json:"offline"`
 	OfflineTimestamp              int64     `json:"offline_timestamp"`
 	IncognitoMode                 bool      `json:"incognito_mode"`

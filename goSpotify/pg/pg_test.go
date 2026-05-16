@@ -45,24 +45,20 @@ func (suite *PostgresTestSuite) TestInsertTrackIntoDbTable() {
 	var countTrack int
 	var countPodcast int
 	var countUser int
-	var countMedia int
 
 	errCountPlayback := suite.pg.db.QueryRow(suite.ctx, "select count(*) from playback").Scan(&countPlayback)
 	errCountTrack := suite.pg.db.QueryRow(suite.ctx, "select count(*) from track").Scan(&countTrack)
 	errCountPodcast := suite.pg.db.QueryRow(suite.ctx, "select count(*) from podcast").Scan(&countPodcast)
 	errCountUser := suite.pg.db.QueryRow(suite.ctx, "select count(*) from users").Scan(&countUser)
-	errCountMedia := suite.pg.db.QueryRow(suite.ctx, "select count(*) from media").Scan(&countMedia)
 	assert.NoError(t, errCountPlayback, "Failed to query playback")
 	assert.NoError(t, errCountTrack, "Failed to query track")
 	assert.NoError(t, errCountPodcast, "Failed to query podcast")
 	assert.NoError(t, errCountUser, "Failed to query user")
-	assert.NoError(t, errCountMedia, "Failed to query media")
 
 	assert.Equal(t, 1, countPlayback, "playback was not inserted correctly")
 	assert.Equal(t, 1, countTrack, "track was not inserted correctly")
 	assert.Equal(t, 0, countPodcast, "podcast was not inserted correctly")
 	assert.Equal(t, 1, countUser, "user was not inserted correctly")
-	assert.Equal(t, 1, countMedia, "media was not inserted correctly")
 }
 
 func (suite *PostgresTestSuite) TestInsertAllCollision() {
@@ -88,26 +84,26 @@ func (suite *PostgresTestSuite) TestInsertPodcastIntoDbTable() {
 	var countTrack int
 	var countPodcast int
 	var countUser int
-	var countMedia int
 
 	errCountPlayback := suite.pg.db.QueryRow(suite.ctx, "select count(*) from playback").Scan(&countPlayback)
 	errCountTrack := suite.pg.db.QueryRow(suite.ctx, "select count(*) from track").Scan(&countTrack)
 	errCountPodcast := suite.pg.db.QueryRow(suite.ctx, "select count(*) from podcast").Scan(&countPodcast)
 	errCountUser := suite.pg.db.QueryRow(suite.ctx, "select count(*) from users").Scan(&countUser)
-	errCountMedia := suite.pg.db.QueryRow(suite.ctx, "select count(*) from media").Scan(&countMedia)
 	assert.NoError(t, errCountPlayback, "Failed to query playback")
 	assert.NoError(t, errCountTrack, "Failed to query track")
 	assert.NoError(t, errCountPodcast, "Failed to query podcast")
 	assert.NoError(t, errCountUser, "Failed to query user")
-	assert.NoError(t, errCountMedia, "Failed to query media")
 
 	assert.Equal(t, 1, countPlayback, "playback was not inserted correctly")
 	assert.Equal(t, 0, countTrack, "track was not inserted correctly")
 	assert.Equal(t, 1, countPodcast, "podcast was not inserted correctly")
 	assert.Equal(t, 1, countUser, "user was not inserted correctly")
-	assert.Equal(t, 1, countMedia, "media was not inserted correctly")
 }
 
+/*
+	 NOTE: Some objects have exact same timestamp due to offline sync issues. Need to check
+		The offline timestamp for the actual timestamp
+*/
 func (suite *PostgresTestSuite) TestInsertOffline() {
 	suite.SetupTest()
 	t := suite.T()
@@ -118,6 +114,11 @@ func (suite *PostgresTestSuite) TestInsertOffline() {
 	assert.Equal(t, d, time.Time(time.Date(2017, time.February, 16, 8, 59, 52, 56000000, time.UTC)))
 }
 
+/*
+	 NOTE: Some objects have exact same timestamp due to offline sync issues. Need to check
+		The offline timestamp for the actual timestamp
+		Check that we can handle multiple objects with same timestamp but different offline timestamp
+*/
 func (suite *PostgresTestSuite) TestInsertOfflineCollision() {
 	suite.SetupTest()
 	t := suite.T()
@@ -125,6 +126,21 @@ func (suite *PostgresTestSuite) TestInsertOfflineCollision() {
 	secondInsert := suite.pg.InsertIntoDb(suite.ctx, pg_testhelper.TestDataValidTrackOffline2)
 	assert.NoError(t, firstInsert, "Should succeed")
 	assert.NoError(t, secondInsert, "Should succeed")
+}
+
+// NOTE: Test for insertion of "unknown" tracks, where  track uri & episode uri is missing
+func (suite *PostgresTestSuite) TestInsertUnknown() {
+	suite.SetupTest()
+	t := suite.T()
+	unknownInsert := suite.pg.InsertIntoDb(suite.ctx, pg_testhelper.TestDataUnknown)
+	assert.NoError(t, unknownInsert, "Failed to insert unknown data")
+	var countPlayback, countTrack int
+	suite.pg.db.QueryRow(suite.ctx, "select count(*) from playback").Scan(&countPlayback)
+	suite.pg.db.QueryRow(suite.ctx, "select count(*) from track").Scan(&countTrack)
+
+	assert.Equal(t, 1, countPlayback, "Playback has NOT 1 row")
+	assert.Equal(t, 0, countTrack, "Track has NOT 0 row")
+
 }
 
 func (suite *PostgresTestSuite) SetupSuite() {
