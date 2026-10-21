@@ -186,7 +186,6 @@ func InsertPlaybackValues(ctx context.Context, pg *Postgres, tx pgx.Tx, data mod
     platform,
     ms_played,
     conn_country,
-    ip_addr_decrypted,
     user_agent_decrypted,
     reason_start,
     reason_end,
@@ -195,7 +194,7 @@ func InsertPlaybackValues(ctx context.Context, pg *Postgres, tx pgx.Tx, data mod
     offline,
     offline_timestamp,
     incognito_mode
-    ) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15, $16, $17)`
+    ) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15, $16)`
 
 	_, mediaId := getMediaType(data)
 	playbackId, err := generatePlaybackId(data.UserName, data.Timestamp, *mediaId)
@@ -214,7 +213,6 @@ func InsertPlaybackValues(ctx context.Context, pg *Postgres, tx pgx.Tx, data mod
 		Platform:           data.Platform,
 		MsPlayed:           data.MsPlayed,
 		ConnCountry:        data.ConnCountry,
-		IpAddrDecrypted:    data.IpAddrDecrypted,
 		UserAgentDecrypted: data.UserAgentDecrypted,
 		ReasonStart:        data.ReasonStart,
 		ReasonEnd:          data.ReasonEnd,
@@ -237,7 +235,6 @@ func InsertPlaybackValues(ctx context.Context, pg *Postgres, tx pgx.Tx, data mod
 		playbackValues.Platform,
 		playbackValues.MsPlayed,
 		playbackValues.ConnCountry,
-		playbackValues.IpAddrDecrypted,
 		playbackValues.UserAgentDecrypted,
 		playbackValues.ReasonStart,
 		playbackValues.ReasonEnd,
@@ -334,7 +331,6 @@ func (pg *Postgres) CreatePlaybackTable(ctx context.Context) error {
     platform VARCHAR,
     ms_played BIGINT,
     conn_country VARCHAR,
-    ip_addr_decrypted VARCHAR,
     user_agent_decrypted VARCHAR,
     reason_start VARCHAR,
     reason_end VARCHAR,

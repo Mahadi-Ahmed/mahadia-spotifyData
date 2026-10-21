@@ -10,7 +10,6 @@ Table playback {
     platform string
     ms_played bigint
     conn_country string
-    ip_addr_decrypted string
     user_agent_decrypted string
     reason_start string
     reason_end string

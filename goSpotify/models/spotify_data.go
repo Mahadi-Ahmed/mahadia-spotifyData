@@ -32,7 +32,6 @@ type Playback struct {
 	Platform           string
 	MsPlayed           int
 	ConnCountry        string
-	IpAddrDecrypted    string
 	UserAgentDecrypted string
 	ReasonStart        string
 	ReasonEnd          string
@@ -50,7 +49,6 @@ type SpotifyData struct {
 	Platform                      string    `json:"platform"`
 	MsPlayed                      int       `json:"ms_played"`
 	ConnCountry                   string    `json:"conn_country"`
-	IpAddrDecrypted               string    `json:"ip_addr_decrypted"`
 	UserAgentDecrypted            string    `json:"user_agent_decrypted"`
 	MasterMetadataTrackName       *string   `json:"master_metadata_track_name"`
 	MasterMetadataAlbumArtistName *string   `json:"master_metadata_album_artist_name"`
